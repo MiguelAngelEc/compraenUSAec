@@ -1,0 +1,63 @@
+{% extends "./base.html" %}
+
+{% block title %} CompraenUSaec Recibo {% endblock %}
+
+{% block body %}
+<div class="col-sm-12 col-md-12 col-lg-10 col-xl-10 bg-light py-4">
+    {% if messages %}
+    {% for message in messages %}
+    <div id="my-alert" class="alert alert-success alert-dismissible fade show col-3" role="alert">
+        <strong class="text-dark">{{ message }}</strong>
+    </div>         
+    {% endfor %}
+    {% endif %}
+
+    <h1 class="py-4">Lista de Clientes</h1>
+    <div class="table-responsive">
+        <table class="table table-stripe">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Còdigo</th>
+                    <th>Nombre y Apellido</th>
+                    <th>Direccion</th>
+                    <th>Ciudad</th>
+                    <th>Telefono</th>
+                    <th>email</th>
+                    <th colspan="2">Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in listado %}
+                <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td>{{c.codigo}}</td>
+                    <td>{{c.Nombre_Apellido}}</td>
+                    <td>{{c.Direccion}}</td>
+                    <td>{{c.Ciudad}}</td>
+                    <td>{{c.Telefono}}</td>
+                    <td>{{c.email}}</td>
+                    <td><a href="edicionCliente/{{c.codigo}}" class="btn btn-info text-white">Editar</a></td>
+                    <td><a href="eliminarCliente/{{c.codigo}}" class="btn btn-danger btnEliminacion">Eliminar</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div> 
+<script>
+    // Agregar la clase 'show' a la alerta para mostrarla
+    document.addEventListener('DOMContentLoaded', function() {
+        var alerta = document.getElementById('my-alert');
+        alerta.classList.add('show');
+    });
+    
+    // Remover la clase 'show' después de 5 segundos
+    setTimeout(function() {
+        var alerta = document.getElementById('my-alert');
+        alerta.classList.remove('show');
+    }, 2000);
+</script>
+    
+
+{% endblock %}

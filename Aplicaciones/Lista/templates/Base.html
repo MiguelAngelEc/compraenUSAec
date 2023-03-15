@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %} </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/gestionClientes.css' %}">  
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-2 col-xl-2 bg-light">
+            <nav class="navbar navbar-dark bg-black flex-column justify-content-start" style="height: 1000px;">
+                <a class="navbar-brand" href="/">
+                  <img src="{% static 'Img/descarga.png' %}" alt="Logo" width="120" height="120" class="d-inline-block align-text-bottom">
+                </a>
+                <ul class="navbar-nav m-3">
+                  <li class="nav-item d-flex align-items-end p-2">
+                    <a class="nav-link" href="{% url 'home' %}"><img src="{% static 'Img/usuario.png' %}" alt="Logo" width="40" height="40" class="d-inline-block align-text-center p-2">Clientes</a>
+                  </li>
+                  <li class="nav-item d-flex align-items-end p-2">
+                    <a class="nav-link" href="{% url 'formularioClientes' %}"><img src="{% static 'Img/folder.png' %}" alt="Logo" width="40" height="40" class="d-inline-block align-text-center p-2">Ingreso</a>
+                  </li>
+                  <li class="nav-item d-flex align-items-end p-2">
+                    <a class="nav-link" href="{% url 'reciboCliente' %}"><img src="{% static 'Img/recibo.png' %}" alt="Logo" width="40" height="40" class="d-inline-block align-text-center p-2">Recibo</a>
+                  </li>
+                </ul>
+            </nav>
+          </div>
+            {% block body %}
+
+            {% endblock %}
+        </div>
+      </div>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+    <script src="{% static 'js/gestionClientes.js' %}"></script>
+</body>
+
+</html>

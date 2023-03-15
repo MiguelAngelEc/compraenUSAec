@@ -1,0 +1,40 @@
+{% extends "./base.html" %}
+
+{% block title %} CompraenUSAec Recibo {% endblock %}
+
+{% block body %}
+<div class="col-md-4 offset-md-3 py-4">
+    <h2>Edicion de Clientes</h2>
+    <div class="row py-4">
+        <div class="card">
+            <div class="card-body">
+                <form action="/editarCliente/" method="POST">{% csrf_token %}
+                    <div class="form-group py-1">
+                        <input type="text" id="txtCodigo" name="txtCodigo" value="{{listado.codigo}}" class="form-control" placeholder="Codigo" minlength="10" maxlength="15" readonly required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="txtNombreApellido" name="txtNombreApellido" value="{{listado.Nombre_Apellido}}"class="form-control" placeholder="Nombre_Apellido"  maxlength="50" required>
+                    </div>
+                    <div class="form-group py-1">
+                        <input type="text" id="txtDireccion" name="txtDireccion" value="{{listado.Direccion}}"class="form-control" placeholder="Direccion"  maxlength="50" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="txtCiudad" name="txtCiudad" value="{{listado.Ciudad}}"class="form-control" placeholder="Ciudad" maxlength="15" required>
+                    </div>
+                    <div class="form-group py-1">
+                        <input type="text" id="txtTelefono" name="txtTelefono" value="{{listado.Telefono}}" class="form-control" placeholder="Telefono" minlength="10" maxlength="15" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="txtEmail" name="txtEmail" value="{{listado.email}}"class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="form-group py-2">
+                        <button type="submit" class="btn btn-success btn-block text-with">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>  
+    </div>
+</div>
+
+
+{% endblock %}

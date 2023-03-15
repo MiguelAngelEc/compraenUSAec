@@ -1,0 +1,148 @@
+{% extends "./base.html" %}
+
+{% block title %} CompraenUSaec Recibo {% endblock %}
+
+{% block body %}
+
+{% load static %}
+<div class="col-sm-12 col-md-12 col-lg-10 col-xl-10 bg-light py-2">
+    <h1 class="py-4">Recibo</h1>
+    <div class="row py-2">
+        <div class="col-3">
+            <form method="post" action="{% url 'buscar_cliente' %}">
+                {% csrf_token %}
+                <input type="text" name="codigo" id="codigo" class="form-control"  placeholder="Ingrese Codigo">
+            </form>
+        </div>
+        <div class="col-2">
+            <div class="form-group">
+                <input type="number" id="miCampoNumerico" placeholder="Costo/Libra:" class="form-control"  maxlength="50" requiredonchange="guardarValor()">
+            </div>
+        </div>
+        <div class="col-3">
+            <label class="d-flex align-items-center" for="tienda-input">ID/COD:
+                <select class="form-control" id="tienda-input" name="tienda-input">
+                    <option value="">Tienda</option>
+                    <option value="tienda1">Tienda 1</option>
+                    <option value="tienda2">Tienda 2</option>
+                    <option value="tienda3">Tienda 3</option>
+                    <option value="tienda4">Tienda 4</option>
+                    <!-- Agrega más opciones aquí -->
+                </select>
+            </label>
+        </div>
+    </div>
+    <!-- Ingreso de Datos del recibo -->
+    <div class="row">
+        <div class="card col-sm-12 col-md-12 col-lg-5 col-xl-5 bg-light">
+            <div class="card-body">
+                <form action="" method="POST">
+                    <div class="form-group py-1">
+                        <input type="text" id="wr-input" name="wr-inpu" class="form-control" placeholder="WR:"  maxlength="50" required>
+                    </div>
+                    <div class="form-group py-1">
+                        <input type="text" id="tracking-input" name="tracking-input" class="form-control" placeholder="Traking ID:"  maxlength="50" required>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card col-sm-12 col-md-12 col-lg-5 col-xl-5 bg-light">
+            <div class="card-body">
+                <form action="" method="POST">
+                    <div class="form-group py-1">
+                        <input type="number" step="0.2" id="precio-input" name="precio-input" class="form-control" placeholder="Precio/Producto:" minlength="10" maxlength="15" required>
+                    </div>
+                    <div class="form-group py-1">
+                        <input type="number" step="0.1" id="precio_l-input" name="precio_l-input" class="form-control" placeholder="Libras:"  maxlength="50" required>
+                    </div>
+                </form>
+                <div class="form-group py-1">
+                    <button type="button" class="btn btn-success btn-block text-with" onclick="agregarFila()">Enviar</button>
+                </div> 
+            </div>
+        </div>   
+      <!-- Inicia el Recibo  -->
+        <div class="row align-items-center g-1">
+            <div class="col-sm-10 col-md-10col-lg-5 col-xl-5 py-1">
+                <h3>@compraenUSAec</h3>
+            </div>
+            
+            <div class="col-sm-10 col-md-10 col-lg-5 col-xl-5 ml-4 py-1 d-flex justify-content-end">
+                <img src="{% static 'Img/logo.png' %}" alt="Logo" width="225" height="75" class="d-inline-block align-text-bottom">
+            </div>
+        </div>
+<!-- Factrura -->
+         <!-- Ingreso de Clientes -->
+        <div class="col-sm-10 col-md-10 col-lg-5 col-xl-5 bg-light">
+            <div class="row justify-content-center align-items-center g-2">
+                <div class="bg-black text-white text-center rounded py-1">
+                    <h4>Cliente</h4>
+                </div>
+                {% if cliente %}
+                    <div>{{ cliente.Nombre_Apellido }}</div>
+                    <div>{{ cliente.Direccion }}</div>
+                    <div>{{ cliente.Telefono }}</div>
+                    <div>{{ cliente.email }}</div>
+                {% endif %}
+                
+                {% if mensaje %}
+                    <p>{{ mensaje }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Direccion -->
+        <div class="col-sm-10 col-md-10 col-lg-5 col-xl-5 bg-light">
+            <div class="row justify-content-center align-items-center g-2">
+                <div class="bg-black text-white text-center rounded py-1">
+                    <h4>Direccion</h4>
+                </div>
+                    <div>PEDRO MONCAYO 6-54 Y OLMEDO</div>
+                    <div>Ibarra-Imbabura</div>
+                    <div>Codigo Postal: 100102</div>
+                    <div>Telf: (+593) 0969090395</div>
+            </div>
+        </div>           
+        <div class="col-10 table-responsive py-1">
+            <table class="table table-stripe">
+                <thead class="bg-black text-white text-center">
+                    <tr>
+                        <th>TIENDA</th>
+                        <th>WR:</th>
+                        <th>TRAKING ID:</th>
+                        <th>PRECIO/PRODUCTO:</th>
+                        <th>LIBRAS</th>
+                        <th>VALOR/PESO</th>
+                        <th>TOTAL</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center" id="tabla-recibos">
+                    <tr>
+                        <td id="tienda-1"> </td>
+                        <td id="wr-1"> </td>
+                        <td id="tracking-1"> </td>
+                        <td id="precio-1"> </td>
+                        <td id="precio_l-1"> </td>
+                        <td id="valor_peso"> </td>
+                        <td id="total_recibo"> </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-6 align-items-end">
+                    <p>Los tiempos de entrega corren desde que el producto solicitado se encuentra en bodegas de MIAMI</p>
+                    <h5>Gracias por su confianza!</h5>
+                </div>
+                <div class="col-3">
+                    <p class= "border-bottom">Subtotal <span></span></p>
+                    <p class= "border-bottom">Flete <span></span></p>
+                    <p class= "border-bottom">ISD  <span></span></p>
+                    <p class= "border-bottom">Total Pagar<span></span></p>
+                </div>
+             </div>
+        </div> 
+    </div>   
+</div>
+{% endblock %}
+
+           
+        

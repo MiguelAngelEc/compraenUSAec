@@ -40,7 +40,7 @@ function agregarFila() {
 
     // Calcular el resultado de la multiplicación
     let valor_peso = miCampoNumerico * precio_l;
-    
+
     // Calcular el resultado de sumar
     let precioNum = parseFloat(precio);
     let valorPesoNum = parseFloat(valor_peso);
@@ -53,7 +53,6 @@ function agregarFila() {
         }
 
     let total_recibo = precioNum + valorPesoNum;
-
 
     
     // Crear una nueva fila en la tabla con los valores ingresados
@@ -79,8 +78,34 @@ function agregarFila() {
     document.getElementById('valor_peso').value = '';
     document.getElementById('total_recibo').value = '';
   }
-  // Función para guardar el valor del campo en el almacenamiento local
 
+  // Obtenemos el campo numérico
+const campoNumerico= document.getElementById("miCampoNumerico");
 
+// Asignamos un listener para el evento "change"
+campoNumerico.addEventListener("change", () => {
+// Guardamos el valor del campo numérico en el almacenamiento local
+localStorage.setItem("miCampoNumerico", campoNumerico.value);
+});
+
+// Obtenemos el campo numérico
+const campoNumerico2 = document.getElementById("miCampoNumerico");
+
+// Asignamos un listener para el evento "change"
+campoNumerico2.addEventListener("change", () => {
+// Guardamos el valor del campo numérico en el almacenamiento local
+localStorage.setItem("miCampoNumerico", campoNumerico2.value);
+});
+
+// Asignamos un listener para el evento "load" del objeto "window"
+window.addEventListener("load", () => {
+// Obtenemos el valor del campo numérico desde el almacenamiento local
+const valorCampoNumerico = localStorage.getItem("miCampoNumerico");
+
+// Si el valor existe, lo asignamos al campo numérico
+if (valorCampoNumerico) {
+    campoNumerico2.value = valorCampoNumerico;
+}
+});
 
 

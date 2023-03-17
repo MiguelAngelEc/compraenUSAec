@@ -11,8 +11,12 @@
     </div>         
     {% endfor %}
     {% endif %}
-
-    <h1 class="py-4">Lista de Clientes</h1>
+    <div class="col-5">
+        <h1 class="py-1">Lista de Clientes</h1>
+    </div>
+    <div class="col-5 py-2">
+        <a href="{% url 'formularioClientes' %}" class="btn btn-outline-secondary">Ingreso</a>
+    </div>
     <div class="table-responsive">
         <table class="table table-stripe">
             <thead>

@@ -127,17 +127,32 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="row d-flex justify-content-between py-4">
+            <div class="row d-flex py-4">
                 <div class="mb-1 col-6 align-items-end border rounded border-dark p-3">
                     <p>Los tiempos de entrega corren desde que el producto solicitado se encuentra en bodegas de MIAMI</p>
                     <h5>Gracias por su confianza!</h5>
                 </div>
-                <div class="col-3">
-                    <p class= "border-bottom">Abono</p>
-                    <p class= "border-bottom">Flete </p>
-                    <p class= "border-bottom">ISD  <span></span></p>
-                    <p class= "border-bottom">Total Pagar<span></span></p>
-                </div>
+                <div class="col-2">
+                    <table>
+                        <tr>
+                          <td>Abono:</td>
+                          <td><input type="text" id="txtAbono" placeholder="Abono" ></td>
+                        </tr>
+                        <tr>
+                          <td>Flete:</td>
+                          <td><input type="text" id="txtFlete" placeholder="Flete" ></td>
+                        </tr>
+                        <tr>
+                          <td>ISD:</td>
+                          <td><input type="text" id="txtISD" placeholder="ISD" ></td>
+                        </tr>
+                        <tr>
+                          <td>Resultado:</td>
+                          <td id="resultado_td"></td>
+                        </tr>
+                      </table>
+                      <button onclick="calcular()">Calcular</button>
+                </div>              
              </div>
         </div> 
     </div>   

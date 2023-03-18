@@ -36,6 +36,7 @@ function agregarFila() {
     let tracking = document.getElementById('tracking-input').value;
     let precio = document.getElementById('precio-input').value;
     let precio_l = document.getElementById('precio_l-input').value;
+    
 
 
     // Calcular el resultado de la multiplicación
@@ -54,7 +55,7 @@ function agregarFila() {
 
     let total_recibo = precioNum + valorPesoNum;
 
-    
+     
     // Crear una nueva fila en la tabla con los valores ingresados
     let nuevaFila = '<tr>' +
       '<td id="tienda-' + (numeroFilas + 1) + '">' + tienda + '</td>' +
@@ -78,6 +79,25 @@ function agregarFila() {
     document.getElementById('valor_peso').value = '';
     document.getElementById('total_recibo').value = '';
   }
+
+// Suma total
+
+// Calcular el resultado Total
+
+function calcular() {
+    let valor_peso2 = parseFloat(document.getElementById('valor_peso').value);
+    let abono = parseFloat(document.getElementById('txtAbono').value);
+    let flete = parseFloat(document.getElementById('txtFlete').value);
+    let isd = parseFloat(document.getElementById('txtISD').value);
+  
+    if (isNaN(valor_peso2) || isNaN(abono) || isNaN(flete) || isNaN(isd)) {
+      document.getElementById('resultado_td').textContent = "Por favor, ingrese valores numéricos en todos los campos";
+    } else {
+      let resultado = (valor_peso2 - abono) + flete + isd;
+      document.getElementById('resultado_td').textContent = resultado;
+    }
+  }
+
 
   // Obtenemos el campo numérico
 const campoNumerico= document.getElementById("miCampoNumerico");

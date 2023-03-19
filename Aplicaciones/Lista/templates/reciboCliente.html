@@ -135,6 +135,22 @@
                 <div class="col-2">
                     <table>
                         <tr>
+                            <td>SubTotal:</td>
+                            <td id="resultado"></td>
+                        </tr>
+                        <script>
+                            function sumarCampos() {
+                        const tabla = document.getElementById('tabla-recibos');
+                        const camposSuma = tabla.querySelectorAll('[id^="total_recibo2"]');
+                        let total = 0;
+                        for (let i = 0; i < camposSuma.length; i++) {
+                            total += parseFloat(camposSuma[i].textContent.replace('$', ''));
+                        }
+                        document.getElementById('resultado').textContent = '$' + total.toFixed(2);
+                        }
+                        // sumarCampos();
+                        </script>
+                        <tr>
                           <td>Abono:</td>
                           <td><input type="text" id="txtAbono" placeholder="Abono" ></td>
                         </tr>
@@ -151,7 +167,7 @@
                           <td id="resultado_td"></td>
                         </tr>
                       </table>
-                      <button onclick="calcular()">Calcular</button>
+                      <button onclick="sumarCampos()">Calcular</button>    
                 </div>              
              </div>
         </div> 

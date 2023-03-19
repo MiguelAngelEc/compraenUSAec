@@ -25,6 +25,7 @@ setTimeout(function() {
 }, 2000);
 
 // Codigo de ingresar datgos al recibo
+let idFila = 1;
 function agregarFila() {
     // Obtener el número de filas actual
     let numeroFilas = document.getElementById('tabla-recibos').getElementsByTagName('tr').length;
@@ -70,6 +71,9 @@ function agregarFila() {
     // Agregar la nueva fila a la tabla
     document.getElementById('tabla-recibos').insertAdjacentHTML('beforeend', nuevaFila);
 
+     // Incrementar el contador de la fila
+     idFila++;
+
     // Limpiar los campos input
     document.getElementById('tienda-input').value = '';
     document.getElementById('wr-input').value = '';
@@ -81,11 +85,18 @@ function agregarFila() {
   }
 
 // Suma total
-
+function sumarCampos() {
+  const camposSuma = document.querySelectorAll('#tabla-recibos td[id^="total_recibo"]');
+  let total = 0;
+  for (let i = 0; i < camposSuma.length; i++) {
+    total += parseFloat(camposSuma[i].textContent.replace('$', ''));
+  }
+  document.getElementById('resultado').textContent = '$' + total.toFixed(2);
+}
 // Calcular el resultado Total
 
 function calcular() {
-    let valor_peso2 = parseFloat(document.getElementById('valor_peso').value);
+    let valor_peso2 = (document.getElementById('total_recibo').value);
     let abono = parseFloat(document.getElementById('txtAbono').value);
     let flete = parseFloat(document.getElementById('txtFlete').value);
     let isd = parseFloat(document.getElementById('txtISD').value);
@@ -96,6 +107,10 @@ function calcular() {
       let resultado = (valor_peso2 - abono) + flete + isd;
       document.getElementById('resultado_td').textContent = resultado;
     }
+
+    document.getElementById('txtAbono').value = '';
+    document.getElementById('txtFlete').value = '';
+    document.getElementById('txtISD').value = '';
   }
 
 

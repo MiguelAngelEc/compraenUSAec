@@ -127,28 +127,23 @@
                     </tr>
                 </tbody>
             </table>
+            <div class="py-4">
+                <button class="btn btn-dark" onclick="sumarCampos()">Calcular Subtotal</button>  
+            </div>
             <div class="row d-flex py-4">
                 <div class="mb-1 col-6 align-items-end border rounded border-dark p-3">
                     <p>Los tiempos de entrega corren desde que el producto solicitado se encuentra en bodegas de MIAMI</p>
                     <h5>Gracias por su confianza!</h5>
                 </div>
                 <div class="col-2">
-                    <table>
+                    <table>                        
                         <tr>
                             <td>SubTotal:</td>
                             <td id="resultado"></td>
                         </tr>
                         <script>
-                            function sumarCampos() {
-                        const tabla = document.getElementById('tabla-recibos');
-                        const camposSuma = tabla.querySelectorAll('[id^="total_recibo2"]');
-                        let total = 0;
-                        for (let i = 0; i < camposSuma.length; i++) {
-                            total += parseFloat(camposSuma[i].textContent.replace('$', ''));
-                        }
-                        document.getElementById('resultado').textContent = '$' + total.toFixed(2);
-                        }
-                        // sumarCampos();
+                          
+        
                         </script>
                         <tr>
                           <td>Abono:</td>
@@ -166,8 +161,7 @@
                           <td>Resultado:</td>
                           <td id="resultado_td"></td>
                         </tr>
-                      </table>
-                      <button onclick="sumarCampos()">Calcular</button>    
+                      </table>  
                 </div>              
              </div>
         </div> 

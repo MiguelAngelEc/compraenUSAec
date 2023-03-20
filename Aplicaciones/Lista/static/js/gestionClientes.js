@@ -43,18 +43,11 @@ function agregarFila() {
     // Calcular el resultado de la multiplicación
     let valor_peso = miCampoNumerico * precio_l;
 
-    // Calcular el resultado de sumar
-    let precioNum = parseFloat(precio);
-    let valorPesoNum = parseFloat(valor_peso);
-        if (isNaN(precioNum)) {
-        precioNum = 0;
-        }
-
-        if (isNaN(valorPesoNum)) {
-        valorPesoNum = 0;
-        }
-
-    let total_recibo = precioNum + valorPesoNum;
+     // Calcular el resultado de sumar
+     let precioNum = isNaN(precio) ? 0 : Number(precio);
+     let valorPesoNum = isNaN(valor_peso) ? 0 : Number(valor_peso);
+     let total_recibo = isNaN(precioNum) || isNaN(valorPesoNum) ? 0 : precioNum + valorPesoNum;
+    
 
      
     // Crear una nueva fila en la tabla con los valores ingresados
@@ -80,8 +73,8 @@ function agregarFila() {
     document.getElementById('tracking-input').value = '';
     document.getElementById('precio-input').value = '';
     document.getElementById('precio_l-input').value = '';
-    document.getElementById('valor_peso').value = '';
-    document.getElementById('total_recibo').value = '';
+    document.getElementById('valor_peso-' + idFila).textContent = '';
+    document.getElementById('total_recibo-' + idFila).textContent = '';
   }
 
 // Suma total
@@ -89,10 +82,16 @@ function sumarCampos() {
   const camposSuma = document.querySelectorAll('#tabla-recibos td[id^="total_recibo"]');
   let total = 0;
   for (let i = 0; i < camposSuma.length; i++) {
-    total += parseFloat(camposSuma[i].textContent.replace('$', ''));
+    const valorCampo = parseFloat(camposSuma[i].textContent);
+    console.log(`Valor obtenido del campo ${i}: ${valorCampo}`);
+    if (!isNaN(valorCampo)) {
+      total += valorCampo;
+    }
   }
-  document.getElementById('resultado').textContent = '$' + total.toFixed(2);
+  document.getElementById('resultado').textContent = total.toFixed(2);
 }
+document.addEventListener('DOMContentLoaded', sumarCampos);
+
 // Calcular el resultado Total
 
 function calcular() {
@@ -114,33 +113,24 @@ function calcular() {
   }
 
 
+
   // Obtenemos el campo numérico
-const campoNumerico= document.getElementById("miCampoNumerico");
+  const campoNumerico = document.getElementById("miCampoNumerico");
 
-// Asignamos un listener para el evento "change"
-campoNumerico.addEventListener("change", () => {
-// Guardamos el valor del campo numérico en el almacenamiento local
-localStorage.setItem("miCampoNumerico", campoNumerico.value);
-});
-
-// Obtenemos el campo numérico
-const campoNumerico2 = document.getElementById("miCampoNumerico");
-
-// Asignamos un listener para el evento "change"
-campoNumerico2.addEventListener("change", () => {
-// Guardamos el valor del campo numérico en el almacenamiento local
-localStorage.setItem("miCampoNumerico", campoNumerico2.value);
-});
-
-// Asignamos un listener para el evento "load" del objeto "window"
-window.addEventListener("load", () => {
-// Obtenemos el valor del campo numérico desde el almacenamiento local
-const valorCampoNumerico = localStorage.getItem("miCampoNumerico");
-
-// Si el valor existe, lo asignamos al campo numérico
-if (valorCampoNumerico) {
-    campoNumerico2.value = valorCampoNumerico;
-}
-});
-
+  // Asignamos un listener para el evento "change"
+  campoNumerico.addEventListener("change", () => {
+    // Guardamos el valor del campo numérico en el almacenamiento local
+    localStorage.setItem("miCampoNumerico", campoNumerico.value);
+  });
+  
+  // Asignamos un listener para el evento "load" del objeto "window"
+  window.addEventListener("load", () => {
+    // Obtenemos el valor del campo numérico desde el almacenamiento local
+    const valorCampoNumerico = localStorage.getItem("miCampoNumerico");
+  
+    // Si el valor existe, lo asignamos al campo numérico
+    if (valorCampoNumerico) {
+      campoNumerico.value = valorCampoNumerico;
+    }
+  });
 

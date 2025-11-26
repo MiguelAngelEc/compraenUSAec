@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Registrar Cliente - CompraEnUSAec{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div class="mb-8 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Registrar Nuevo Cliente</h2>
+            <p class="text-gray-500 mt-1">Complete la información para agregar un cliente al sistema.</p>
+        </div>
+
+        <form method="POST" action="{% url 'registro' %}" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cédula / Código</label>
+                    {{ form.codigo }}
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                    {{ form.Nombre_Apellido }}
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    {{ form.Telefono }}
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                    {{ form.Ciudad }}
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    {{ form.Direccion }}
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    {{ form.email }}
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-6">
+                <a href="{% url 'home' %}"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Guardar Cliente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

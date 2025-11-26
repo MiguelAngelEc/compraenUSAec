@@ -1,6 +1,20 @@
 from django.contrib import admin
-from .models import Clientes
+from .models import Clientes, Recibo, DetalleRecibo
 
-# Register your models here.
+class DetalleReciboInline(admin.TabularInline):
+    model = DetalleRecibo
+    extra = 0
 
-admin.site.register(Clientes)
+@admin.register(Recibo)
+class ReciboAdmin(admin.ModelAdmin):
+    list_display = ('id', 'cliente', 'fecha', 'total')
+    list_filter = ('fecha',)
+    search_fields = ('cliente__Nombre_Apellido', 'cliente__codigo')
+    inlines = [DetalleReciboInline]
+
+@admin.register(Clientes)
+class ClientesAdmin(admin.ModelAdmin):
+    list_display = ('codigo', 'Nombre_Apellido', 'Ciudad', 'Telefono')
+    search_fields = ('codigo', 'Nombre_Apellido')
+
+# admin.site.register(Clientes, ClientesAdmin) # Ya registrado con decorador

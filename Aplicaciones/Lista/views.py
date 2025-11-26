@@ -1,92 +1,95 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from .models import Clientes
 from django.contrib import messages
+from .models import Clientes, Recibo
+from .forms import ClienteForm
+from .services import ClienteService, ReciboService
+import json
 
-# Create your views here.
+# --- Vistas de Clientes ---
 
 def home(request):
-       clientesListados = Clientes.objects.all()
-       # Despliega informacion a la pagina principal
-       return render(request, "gestionLista.html", {"listado": clientesListados})
-
-def formularioClientes(request):
-    # código de tu vista aquí
-    return render(request, 'formularioClientes.html')
-
-def reciboCliente(request):
-    # código de tu vista aquí
-    return render(request, 'reciboCliente.html')
+    clientes = Clientes.objects.all()
+    return render(request, "gestionLista.html", {"listado": clientes})
 
 def registro(request):
     if request.method == 'POST':
-        codigo = request.POST.get('txtCodigo')
-        nombre = request.POST.get('txtNombreApellido')
-        direccion = request.POST.get('txtDireccion')
-        ciudad = request.POST.get('txtCiudad')
-        telefono = request.POST.get('txtTelefono')
-        email = request.POST.get('txtEmail')
-        
-        # Comprueba si ya existe un registro con el mismo código
-        if Clientes.objects.filter(codigo=codigo).exists():
-            messages.warning(request, 'Ya existe un cliente con ese código')
+        form = ClienteForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Cliente registrado exitosamente!')
+            return redirect('home')
         else:
-            # Crea el registro en la base de datos
-            listado = Clientes.objects.create(codigo=codigo, Nombre_Apellido=nombre, Direccion=direccion, Ciudad=ciudad, Telefono=telefono, email=email)
-            messages.success(request, 'Cliente Ingresado!!')
-            
-        return redirect('/')
+            messages.warning(request, 'Error en el formulario. Verifique los datos.')
+    else:
+        form = ClienteForm()
     
-    # Si no se ha enviado un formulario, renderiza la plantilla del formulario
-    return render(request, 'registro.html')
+    return render(request, 'registro.html', {'form': form})
 
-#Codigo para edicion
 def edicionCliente(request, codigo):
-       listado = Clientes.objects.get(codigo=codigo)
-       return render(request, "edicionCliente.html", {"listado": listado})
+    cliente = get_object_or_404(Clientes, codigo=codigo)
+    return render(request, "edicionCliente.html", {"cliente": cliente})
 
 def editarCliente(request):
-       codigo=request.POST['txtCodigo']
-       nombre=request.POST['txtNombreApellido']
-       direccion=request.POST['txtDireccion']
-       ciudad=request.POST['txtCiudad']
-       telefono=request.POST['txtTelefono']
-       email=request.POST['txtEmail']
-       
-       listado = Clientes.objects.get(codigo=codigo)
-       listado.Nombre_Apellido = nombre
-       listado.Direccion = direccion
-       listado.Ciudad = ciudad
-       listado.Telefono = telefono
-       listado.email = email
-       listado.save()
-       
-       return redirect('/')
-
-#Codigo para eliminar
-def eliminarCliente(request, codigo):
-       listado = Clientes.objects.get(codigo=codigo)
-       listado.delete()
-       messages.success(request, 'Cliente Eliminado!!')
-       return redirect('/')
-
-# Codigo para Buscar Cliente
-def buscar_cliente(request):
     if request.method == 'POST':
-        codigo = request.POST['codigo']
-        cliente = Clientes.objects.filter(codigo=codigo).first()
-        if cliente:
-            return render(request, 'reciboCliente.html', {'cliente': cliente})
-        else:
-            mensaje = f"No se encontró un cliente con el código {codigo}."
-            return render(request, 'reciboCliente.html', {'mensaje': mensaje})
+        codigo = request.POST.get('txtCodigo')
+        cliente = get_object_or_404(Clientes, codigo=codigo)
+        
+        cliente.Nombre_Apellido = request.POST.get('txtNombreApellido')
+        cliente.Direccion = request.POST.get('txtDireccion')
+        cliente.Ciudad = request.POST.get('txtCiudad')
+        cliente.Telefono = request.POST.get('txtTelefono')
+        cliente.email = request.POST.get('txtEmail')
+        cliente.save()
+        
+        messages.success(request, 'Cliente actualizado!')
+        return redirect('home')
+
+def eliminarCliente(request, codigo):
+    cliente = get_object_or_404(Clientes, codigo=codigo)
+    cliente.delete()
+    messages.success(request, 'Cliente eliminado!')
+    return redirect('home')
+
+# --- Vistas de Recibos (Nueva Lógica) ---
+
+def recibo_view(request):
+    """Vista principal para generar recibos"""
+    return render(request, 'recibo_app.html')
+
+def buscar_cliente_api(request):
+    """API para buscar cliente por código/cédula via AJAX"""
+    codigo = request.GET.get('codigo')
+    cliente = ClienteService.buscar_por_codigo(codigo)
+    
+    if cliente:
+        data = {
+            'found': True,
+            'nombre': cliente.Nombre_Apellido,
+            'direccion': cliente.Direccion,
+            'telefono': cliente.Telefono,
+            'email': cliente.email
+        }
     else:
-        return render(request, 'reciboCliente.html')
+        data = {'found': False}
+    
+    return JsonResponse(data)
 
-#Codigo para Multiplicar
+def guardar_recibo_api(request):
+    """API para guardar el recibo generado"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            cliente_codigo = data.get('cliente_codigo')
+            items = data.get('items')
+            
+            recibo = ReciboService.crear_recibo(cliente_codigo, items)
+            
+            return JsonResponse({'success': True, 'recibo_id': recibo.id})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
-
- 
-
-
-  
+def ver_recibo(request, recibo_id):
+    recibo = get_object_or_404(Recibo, id=recibo_id)
+    return render(request, 'recibo_print.html', {'recibo': recibo})

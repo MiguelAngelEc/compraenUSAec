@@ -1,40 +1,68 @@
-{% extends "./base.html" %}
+{% extends 'base.html' %}
 
-{% block title %} CompraenUSAec Recibo {% endblock %}
+{% block title %}Editar Cliente - CompraEnUSAec{% endblock %}
 
-{% block body %}
-<div class="col-md-4 offset-md-3 py-4">
-    <h2>Edicion de Clientes</h2>
-    <div class="row py-4">
-        <div class="card">
-            <div class="card-body">
-                <form action="/editarCliente/" method="POST">{% csrf_token %}
-                    <div class="form-group py-1">
-                        <input type="text" id="txtCodigo" name="txtCodigo" value="{{listado.codigo}}" class="form-control" placeholder="Codigo" minlength="10" maxlength="15" readonly required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="txtNombreApellido" name="txtNombreApellido" value="{{listado.Nombre_Apellido}}"class="form-control" placeholder="Nombre_Apellido"  maxlength="50" required>
-                    </div>
-                    <div class="form-group py-1">
-                        <input type="text" id="txtDireccion" name="txtDireccion" value="{{listado.Direccion}}"class="form-control" placeholder="Direccion"  maxlength="50" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="txtCiudad" name="txtCiudad" value="{{listado.Ciudad}}"class="form-control" placeholder="Ciudad" maxlength="15" required>
-                    </div>
-                    <div class="form-group py-1">
-                        <input type="text" id="txtTelefono" name="txtTelefono" value="{{listado.Telefono}}" class="form-control" placeholder="Telefono" minlength="10" maxlength="15" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="email" id="txtEmail" name="txtEmail" value="{{listado.email}}"class="form-control" placeholder="Email" required>
-                    </div>
-                    <div class="form-group py-2">
-                        <button type="submit" class="btn btn-success btn-block text-with">Guardar</button>
-                    </div>
-                </form>
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        <div class="mb-8 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Editar Cliente</h2>
+            <p class="text-gray-500 mt-1">Modifique los datos del cliente seleccionado.</p>
+        </div>
+
+        <form method="POST" action="{% url 'editarCliente' %}" class="space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="txtCodigo" value="{{cliente.codigo}}">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cédula / Código</label>
+                    <input type="text" value="{{cliente.codigo}}" disabled
+                        class="w-full bg-gray-100 border border-gray-300 rounded-lg px-3 py-2 text-gray-500 cursor-not-allowed">
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                    <input type="text" name="txtNombreApellido" value="{{cliente.Nombre_Apellido}}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" name="txtTelefono" value="{{cliente.Telefono}}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
+                <div class="col-span-1">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad</label>
+                    <input type="text" name="txtCiudad" value="{{cliente.Ciudad}}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                    <input type="text" name="txtDireccion" value="{{cliente.Direccion}}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    <input type="email" name="txtEmail" value="{{cliente.email}}"
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                        required>
+                </div>
             </div>
-        </div>  
+
+            <div class="flex justify-end gap-3 pt-6">
+                <a href="{% url 'home' %}"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    Cancelar
+                </a>
+                <button type="submit"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                    Actualizar Cliente
+                </button>
+            </div>
+        </form>
     </div>
 </div>
-
-
 {% endblock %}

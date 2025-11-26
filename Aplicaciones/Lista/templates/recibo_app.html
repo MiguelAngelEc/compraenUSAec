@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Generar Recibo - CompraEnUSAec{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+        <!-- Columna Izquierda: Datos y Controles -->
+        <div class="md:col-span-2 space-y-6">
+
+            <!-- Buscador de Cliente -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">1. Datos del Cliente</h2>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="inputCedula" placeholder="Ingrese Cédula/Código"
+                        class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border">
+                    <button onclick="buscarCliente()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        Buscar
+                    </button>
+                </div>
+
+                <div id="clienteInfo" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-100">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Nombre</span>
+                            <span class="font-semibold text-gray-800" id="infoNombre"></span>
+                        </div>
+                        <div>
+                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Teléfono</span>
+                            <span class="font-medium text-gray-800" id="infoTelefono"></span>
+                        </div>
+                        <div class="col-span-2">
+                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Dirección</span>
+                            <span class="font-medium text-gray-800" id="infoDireccion"></span>
+                        </div>
+                    </div>
+                </div>
+                <p id="errorCliente" class="hidden text-red-500 text-sm mt-2">Cliente no encontrado.</p>
+            </div>
+
+            <!-- Agregar Items -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 opacity-50 pointer-events-none transition-opacity"
+                id="panelItems">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4">2. Agregar Productos</h2>
+                <div class="grid grid-cols-12 gap-3 mb-4">
+                    <div class="col-span-6">
+                        <input type="text" id="itemDesc" placeholder="Descripción"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
+                    </div>
+                    <div class="col-span-2">
+                        <input type="number" id="itemCant" placeholder="Cant." value="1" min="1"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-center">
+                    </div>
+                    <div class="col-span-3">
+                        <input type="number" id="itemPrecio" placeholder="Precio ($)" step="0.01"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-right">
+                    </div>
+                    <div class="col-span-1">
+                        <button onclick="agregarItem()"
+                            class="w-full h-full flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Columna Derecha: Resumen del Recibo -->
+        <div class="md:col-span-1">
+            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 sticky top-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-4">Resumen de Recibo</h3>
+
+                <div class="space-y-4 mb-6 max-h-[400px] overflow-y-auto" id="listaItems">
+                    <!-- Items se agregarán aquí -->
+                    <p class="text-gray-400 text-center py-4 italic" id="emptyState">No hay ítems agregados</p>
+                </div>
+
+                <div class="border-t pt-4 space-y-2">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Subtotal</span>
+                        <span id="resumenSubtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between text-2xl font-bold text-gray-900 pt-2">
+                        <span>Total</span>
+                        <span id="resumenTotal">$0.00</span>
+                    </div>
+                </div>
+
+                <button onclick="guardarRecibo()" id="btnGuardar"
+                    class="w-full mt-8 bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    Generar Recibo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let clienteActual = null;
+    let items = [];
+
+    function buscarCliente() {
+        const codigo = document.getElementById('inputCedula').value;
+        if (!codigo) return;
+
+        fetch(`/api/buscar-cliente/?codigo=${codigo}`)
+            .then(r => r.json())
+            .then(data => {
+                const infoDiv = document.getElementById('clienteInfo');
+                const errorP = document.getElementById('errorCliente');
+                const panelItems = document.getElementById('panelItems');
+
+                if (data.found) {
+                    clienteActual = codigo;
+                    document.getElementById('infoNombre').textContent = data.nombre;
+                    document.getElementById('infoTelefono').textContent = data.telefono;
+                    document.getElementById('infoDireccion').textContent = data.direccion;
+
+                    infoDiv.classList.remove('hidden');
+                    errorP.classList.add('hidden');
+                    panelItems.classList.remove('opacity-50', 'pointer-events-none');
+                } else {
+                    clienteActual = null;
+                    infoDiv.classList.add('hidden');
+                    errorP.classList.remove('hidden');
+                    panelItems.classList.add('opacity-50', 'pointer-events-none');
+                }
+            });
+    }
+
+    function agregarItem() {
+        const desc = document.getElementById('itemDesc').value;
+        const cant = parseInt(document.getElementById('itemCant').value);
+        const precio = parseFloat(document.getElementById('itemPrecio').value);
+
+        if (!desc || !cant || isNaN(precio)) return;
+
+        const subtotal = cant * precio;
+        items.push({ descripcion: desc, cantidad: cant, precio_unitario: precio, subtotal: subtotal });
+
+        actualizarVistaItems();
+        limpiarInputsItem();
+    }
+
+    function limpiarInputsItem() {
+        document.getElementById('itemDesc').value = '';
+        document.getElementById('itemCant').value = '1';
+        document.getElementById('itemPrecio').value = '';
+        document.getElementById('itemDesc').focus();
+    }
+
+    function actualizarVistaItems() {
+        const lista = document.getElementById('listaItems');
+        const empty = document.getElementById('emptyState');
+        const btn = document.getElementById('btnGuardar');
+
+        if (items.length > 0) {
+            empty.classList.add('hidden');
+            btn.disabled = false;
+        } else {
+            empty.classList.remove('hidden');
+            btn.disabled = true;
+        }
+
+        lista.innerHTML = '';
+        let total = 0;
+
+        items.forEach((item, index) => {
+            total += item.subtotal;
+            const div = document.createElement('div');
+            div.className = 'flex justify-between items-start text-sm group';
+            div.innerHTML = `
+                <div class="flex-1">
+                    <p class="font-medium text-gray-800">${item.descripcion}</p>
+                    <p class="text-gray-500 text-xs">${item.cantidad} x $${item.precio_unitario.toFixed(2)}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-semibold text-gray-700">$${item.subtotal.toFixed(2)}</span>
+                    <button onclick="eliminarItem(${index})" class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                        &times;
+                    </button>
+                </div>
+            `;
+            lista.appendChild(div);
+        });
+
+        document.getElementById('resumenSubtotal').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('resumenTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    function eliminarItem(index) {
+        items.splice(index, 1);
+        actualizarVistaItems();
+    }
+
+    function guardarRecibo() {
+        if (!clienteActual || items.length === 0) return;
+
+        const btn = document.getElementById('btnGuardar');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Procesando...';
+
+        fetch('/api/guardar-recibo/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                cliente_codigo: clienteActual,
+                items: items
+            })
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirigir a la vista de impresión del recibo
+                    window.location.href = `/recibo/${data.recibo_id}/`;
+                } else {
+                    alert('Error: ' + data.error);
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            })
+            .catch(err => {
+                alert('Error de conexión');
+                btn.disabled = false;
+                btn.textContent = originalText;
+            });
+    }
+</script>
+{% endblock %}

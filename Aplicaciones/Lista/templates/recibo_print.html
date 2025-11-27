@@ -1,11 +1,11 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibo #{{ recibo.id }} - CompraEnUSAec</title>
-    <link rel="stylesheet" href="{% static 'css/recibo_print.css' %}">
+    <!-- Ruta relativa para PDF (base_url apunta a static/) -->
+    <link rel="stylesheet" href="css/recibo_print.css">
 </head>
 <body>
     <div class="recibo-container">
@@ -16,7 +16,8 @@
                 <p class="empresa-social">@compraenusaec</p>
             </div>
             <div class="empresa-logo">
-                <img src="{% static 'Img/Logo.png' %}" alt="CompraEnUSAec">
+                <!-- Ruta relativa para PDF (base_url apunta a static/) -->
+                <img src="Img/Logo.png" alt="CompraEnUSAec">
             </div>
         </header>
 

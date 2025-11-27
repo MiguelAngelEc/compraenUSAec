@@ -75,13 +75,12 @@ def generate_pdf_weasyprint(template_name, context, filename="document.pdf"):
     # Renderizar el HTML
     html_string = render_to_string(template_name, context)
 
-    # Crear el PDF
-    html = HTML(string=html_string, base_url=settings.STATIC_URL)
+    # Crear el PDF con base_url apuntando al directorio static
+    static_dir = os.path.join(settings.BASE_DIR, "Aplicaciones", "Lista", "static")
+    html = HTML(string=html_string, base_url=static_dir)
 
     # Obtener CSS personalizado si existe
-    css_path = os.path.join(
-        settings.BASE_DIR, "Aplicaciones", "Lista", "static", "css", "recibo_print.css"
-    )
+    css_path = os.path.join(static_dir, "css", "recibo_print.css")
 
     stylesheets = []
     if os.path.exists(css_path):
@@ -115,12 +114,16 @@ def generate_pdf_xhtml2pdf(template_name, context, filename="document.pdf"):
         HttpResponse con el PDF
     """
     from django.conf import settings
+    import os
 
     # Renderizar el HTML
     html_string = render_to_string(template_name, context)
 
     # Crear buffer para el PDF
     result = BytesIO()
+
+    # Ruta base de archivos estáticos de la app
+    app_static = os.path.join(settings.BASE_DIR, "Aplicaciones", "Lista", "static")
 
     # Función para resolver enlaces (imágenes, CSS)
     def link_callback(uri, rel):
@@ -129,20 +132,30 @@ def generate_pdf_xhtml2pdf(template_name, context, filename="document.pdf"):
         """
         import os
 
-        # Manejar archivos estáticos
+        # Si es una ruta relativa (como css/recibo_print.css o Img/Logo.png)
+        if not uri.startswith(("http://", "https://", "/")):
+            full_path = os.path.join(app_static, uri)
+            if os.path.exists(full_path):
+                return full_path
+
+        # Manejar archivos estáticos con URL completa
         if uri.startswith(settings.STATIC_URL):
             path = uri.replace(settings.STATIC_URL, "")
+            # Primero buscar en el static de la app
+            full_path = os.path.join(app_static, path)
+            if os.path.exists(full_path):
+                return full_path
             # Buscar en STATICFILES_DIRS
             for static_dir in getattr(settings, "STATICFILES_DIRS", []):
                 full_path = os.path.join(static_dir, path)
                 if os.path.exists(full_path):
                     return full_path
-            # Buscar en apps
+            # Buscar usando finders
             from django.contrib.staticfiles import finders
 
-            result = finders.find(path)
-            if result:
-                return result
+            found = finders.find(path)
+            if found:
+                return found
 
         # Manejar archivos media
         if uri.startswith(settings.MEDIA_URL):

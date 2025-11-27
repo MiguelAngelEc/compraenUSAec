@@ -1,0 +1,182 @@
+# ===========================================
+# CompraEnUSAec - .gitignore
+# ===========================================
+
+# ===========================================
+# Python
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ===========================================
+# Virtual Environments
+# ===========================================
+venv/
+ENV/
+env/
+.venv/
+.env/
+pythonenv*/
+
+# ===========================================
+# Django
+# ===========================================
+*.log
+local_settings.py
+db.sqlite3
+*.sqlite3
+Aplicaciones.db
+media/
+staticfiles/
+static_collected/
+
+# Migraciones (opcional - descomentar si no quieres versionar)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# ===========================================
+# IDE y Editores
+# ===========================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ===========================================
+# Sistema Operativo
+# ===========================================
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.directory
+
+# ===========================================
+# Archivos de Configuración Local
+# ===========================================
+.env
+.env.local
+.env.*.local
+*.local.py
+secrets.py
+config.local.py
+
+# ===========================================
+# Testing y Coverage
+# ===========================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ===========================================
+# Documentación
+# ===========================================
+docs/_build/
+site/
+
+# ===========================================
+# Archivos Temporales
+# ===========================================
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ===========================================
+# Logs
+# ===========================================
+logs/
+*.log
+npm-debug.log*
+
+# ===========================================
+# Dependencias de Node (si se usa)
+# ===========================================
+node_modules/
+package-lock.json
+yarn.lock
+
+# ===========================================
+# Archivos de Caché
+# ===========================================
+.cache/
+*.cache
+
+# ===========================================
+# Archivos Generados
+# ===========================================
+*.pdf
+!Aplicaciones/Lista/static/Img/*.pdf
+
+# ===========================================
+# Producción - Hostinger
+# ===========================================
+# Archivos de configuración local de producción
+settings_local.py
+.env.production
+
+# Archivos estáticos colectados
+staticfiles/
+static_collected/
+
+# Logs de producción
+django_errors.log
+error.log
+access.log
+
+# Archivos de backup de base de datos
+*.sql
+*.dump
+db_backup/

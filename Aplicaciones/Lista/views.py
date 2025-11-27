@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse
 from django.contrib import messages
-from django_weasyprint import WeasyTemplateResponseMixin
-from django_weasyprint.views import WeasyTemplateResponse
 from .models import Clientes, Recibo
 from .forms import ClienteForm
 from .services import ClienteService, ReciboService
+from .pdf_service import generate_pdf, get_pdf_engine, test_pdf_engines
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 # --- Vistas de Clientes ---
 
@@ -108,10 +110,30 @@ def ver_recibo(request, recibo_id):
 
 
 def recibo_pdf(request, recibo_id):
+    """
+    Genera el PDF del recibo usando el motor disponible.
+    Soporta WeasyPrint (mejor calidad) y xhtml2pdf (más compatible).
+    """
     recibo = get_object_or_404(Recibo, id=recibo_id)
-    return WeasyTemplateResponse(
-        request=request,
-        template="recibo_print.html",
-        context={"recibo": recibo},
-        filename=f"recibo_{recibo_id}.pdf",
-    )
+
+    try:
+        return generate_pdf(
+            template_name="recibo_print.html",
+            context={"recibo": recibo},
+            filename=f"recibo_{recibo_id}.pdf",
+        )
+    except RuntimeError as e:
+        logger.error(f"Error generando PDF: {e}")
+        return HttpResponse(
+            "Error: No hay motor de PDF disponible. Contacte al administrador.",
+            status=500,
+        )
+
+
+def pdf_status(request):
+    """
+    Vista de diagnóstico para verificar el estado de los motores PDF.
+    Útil para debugging en producción.
+    """
+    status = test_pdf_engines()
+    return JsonResponse(status)

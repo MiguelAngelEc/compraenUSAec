@@ -1,0 +1,53 @@
+# ===========================================
+# CompraEnUSAec - Sistema de Recibos
+# Dependencias del Proyecto
+# ===========================================
+
+# ===========================================
+# FRAMEWORK PRINCIPAL
+# ===========================================
+Django>=3.1.3,<4.0
+
+# ===========================================
+# GENERACIÓN DE PDF
+# ===========================================
+# Opción 1: WeasyPrint (requiere GTK3 - puede no funcionar en Hostinger)
+django-weasyprint>=2.2.0
+WeasyPrint>=59.0
+
+# Opción 2: xhtml2pdf (alternativa más compatible con hosting compartido)
+xhtml2pdf>=0.2.11
+
+# Dependencias comunes para PDF
+Pillow>=9.0.0
+reportlab>=4.0.0
+
+# ===========================================
+# SERVIDOR Y PRODUCCIÓN
+# ===========================================
+# Servidor WSGI
+gunicorn>=21.0.0
+
+# Archivos estáticos en producción
+whitenoise>=6.0.0
+
+# ===========================================
+# SEGURIDAD Y UTILIDADES
+# ===========================================
+# Variables de entorno (recomendado para producción)
+python-dotenv>=1.0.0
+
+# ===========================================
+# BASE DE DATOS (Opcionales)
+# ===========================================
+# SQLite viene incluido en Python
+# Descomentar si usas PostgreSQL o MySQL:
+# psycopg2-binary>=2.9.0    # PostgreSQL
+# mysqlclient>=2.1.0        # MySQL
+
+# ===========================================
+# DESARROLLO (Opcional)
+# ===========================================
+# Descomentar para desarrollo local:
+# django-debug-toolbar>=4.0.0
+# django-extensions>=3.2.0

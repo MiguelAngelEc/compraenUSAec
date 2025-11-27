@@ -1,0 +1,162 @@
+# ===========================================
+
+# CompraEnUSAec - Configuración Apache (.htaccess)
+
+# Para Hostinger con Passenger
+
+# ===========================================
+
+# ===========================================
+
+# PASSENGER - Aplicación Python
+
+# ===========================================
+
+# Hostinger usa Passenger para ejecutar aplicaciones Python
+
+# El archivo passenger_wsgi.py debe estar en la raíz
+
+PassengerEnabled On
+PassengerAppRoot /home/u276243840/domains/compraenusaec.com/public_html/recibo
+PassengerPython /home/u276243840/virtualenv/recibo/3.11/bin/python
+
+# ===========================================
+
+# REESCRITURA DE URLs
+
+# ===========================================
+
+RewriteEngine On
+
+# Forzar HTTPS
+
+RewriteCond %{HTTPS} off
+RewriteRule ^(.\*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Redirigir www a no-www (opcional)
+
+# RewriteCond %{HTTP_HOST} ^www\.(.\*)$ [NC]
+
+# RewriteRule ^(.\*)$ https://%1/$1 [R=301,L]
+
+# ===========================================
+
+# ARCHIVOS ESTÁTICOS
+
+# ===========================================
+
+# Servir archivos estáticos directamente sin pasar por Django
+
+# Archivos estáticos
+
+RewriteCond %{REQUEST_URI} ^/static/
+RewriteRule ^static/(.\*)$ staticfiles/$1 [L]
+
+# Archivos media (uploads)
+
+RewriteCond %{REQUEST_URI} ^/media/
+RewriteRule ^media/(.\*)$ media/$1 [L]
+
+# ===========================================
+
+# SEGURIDAD
+
+# ===========================================
+
+# Ocultar información del servidor
+
+ServerSignature Off
+
+# Prevenir acceso a archivos sensibles
+
+<FilesMatch "(^\.htaccess|\.git|\.env|\.pyc|**pycache**|\.sqlite3|\.db)">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# Proteger archivos de configuración
+
+<FilesMatch "(settings\.py|settings_production\.py|passenger_wsgi\.py)">
+Order Allow,Deny
+Deny from all
+</FilesMatch>
+
+# ===========================================
+
+# CACHÉ DE ARCHIVOS ESTÁTICOS
+
+# ===========================================
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Imágenes
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS y JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    
+    # Fuentes
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    
+    # PDF
+    ExpiresByType application/pdf "access plus 1 week"
+</IfModule>
+
+# ===========================================
+
+# COMPRESIÓN GZIP
+
+# ===========================================
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# ===========================================
+
+# HEADERS DE SEGURIDAD
+
+# ===========================================
+
+<IfModule mod_headers.c>
+    # Prevenir clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevenir MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Habilitar XSS Protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (ajustar según necesidades)
+    # Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' cdn.tailwindcss.com; img-src 'self' data:;"
+</IfModule>
+
+# ===========================================
+
+# MANEJO DE ERRORES
+
+# ===========================================
+
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+ErrorDocument 503 /503.html

@@ -1,46 +1,49 @@
-"""
-Configuración de Django para Producción en Hostinger
-"""
-
 from .settings import *
 import os
 
+# ======================
 # SEGURIDAD
+# ======================
 DEBUG = False
 
-# Dominios permitidos
-ALLOWED_HOSTS = ["*"]
+# Dominios permitidos (agrega tu dominio real y subdominios si los hay)
+ALLOWED_HOSTS = [
+    "recibo-compraenusaec.onrender.com",
+    "compraenusaec.com",
+    "www.compraenusaec.com",
+]
 
-# Clave secreta - CAMBIAR EN PRODUCCIÓN
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY", "django-insecure-CAMBIAR-ESTA-CLAVE-POR-UNA-SEGURA-Y-UNICA"
-)
+# Clave secreta segura desde variable de entorno
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError("La variable de entorno DJANGO_SECRET_KEY no está configurada!")
 
-# Base de datos
+# ======================
+# BASE DE DATOS
+# ======================
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "/home/u276243840/domains/compraenusaec.com/public_html/recibo/Aplicaciones.db",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),  # Más portable
     }
 }
 
-# Archivos estáticos
+# ======================
+# ARCHIVOS ESTÁTICOS Y MEDIA
+# ======================
 STATIC_URL = "/static/"
-STATIC_ROOT = (
-    "/home/u276243840/domains/compraenusaec.com/public_html/recibo/staticfiles/"
-)
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
-# Archivos media (uploads)
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/home/u276243840/domains/compraenusaec.com/public_html/recibo/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# Agregar WhiteNoise para servir archivos estáticos
+# WhiteNoise para servir archivos estáticos
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-
-# Configuración de WhiteNoise
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Seguridad HTTPS
+# ======================
+# SEGURIDAD HTTPS
+# ======================
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -48,11 +51,12 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
-# Configuración de cookies
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 
-# Logging para debugging en producción
+# ======================
+# LOGGING
+# ======================
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -60,7 +64,7 @@ LOGGING = {
         "file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
-            "filename": "/home/u276243840/domains/compraenusaec.com/public_html/recibo/django_errors.log",
+            "filename": os.path.join(BASE_DIR, "django_errors.log"),
         },
     },
     "loggers": {
@@ -71,13 +75,3 @@ LOGGING = {
         },
     },
 }
-
-# Configuración de correo (opcional - para notificaciones de error)
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.hostinger.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'tu-email@compraenusaec.com'
-# EMAIL_HOST_PASSWORD = 'tu-password'
-# DEFAULT_FROM_EMAIL = 'tu-email@compraenusaec.com'
-# ADMINS = [('Admin', 'admin@compraenusaec.com')]

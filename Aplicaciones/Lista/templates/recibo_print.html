@@ -1,89 +1,104 @@
-{% extends 'base.html' %}
-
-{% block title %}Recibo #{{ recibo.id }} - CompraEnUSAec{% endblock %}
-
-{% block content %}
-<div
-    class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200 print:shadow-none print:border-none">
-
-    <!-- Header Recibo -->
-    <div class="flex justify-between items-start border-b pb-8 mb-8">
-        <div>
-            <h1 class="text-3xl font-bold text-gray-900">RECIBO</h1>
-            <p class="text-gray-500 mt-1"># {{ recibo.id|stringformat:"06d" }}</p>
-        </div>
-        <div class="text-right">
-            <h2 class="text-xl font-bold text-blue-600">CompraEnUSAec</h2>
-            <p class="text-sm text-gray-500 mt-1">Fecha: {{ recibo.fecha|date:"d/m/Y H:i" }}</p>
-        </div>
-    </div>
-
-    <!-- Info Cliente -->
-    <div class="mb-8 bg-gray-50 p-6 rounded-lg print:bg-transparent print:p-0">
-        <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">Facturar a:</h3>
-        <div class="grid grid-cols-2 gap-4">
-            <div>
-                <p class="font-bold text-gray-900">{{ recibo.cliente.Nombre_Apellido }}</p>
-                <p class="text-gray-600 text-sm">{{ recibo.cliente.Direccion }}</p>
-                <p class="text-gray-600 text-sm">{{ recibo.cliente.Ciudad }}</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo #{{ recibo.id }} - CompraEnUSAec</title>
+    <link rel="stylesheet" href="{% static 'css/recibo_print.css' %}">
+</head>
+<body>
+    <div class="recibo-container">
+        <!-- Header -->
+        <header class="recibo-header">
+            <div class="empresa-info">
+                <h1 class="empresa-nombre">CompraenUSAec</h1>
+                <p class="empresa-social">@compraenusaec</p>
             </div>
-            <div class="text-right">
-                <p class="text-gray-600 text-sm">C.I./RUC: {{ recibo.cliente.codigo }}</p>
-                <p class="text-gray-600 text-sm">{{ recibo.cliente.Telefono }}</p>
-                <p class="text-gray-600 text-sm">{{ recibo.cliente.email }}</p>
+            <div class="empresa-logo">
+                <img src="{% static 'Img/Logo.png' %}" alt="CompraEnUSAec">
             </div>
-        </div>
-    </div>
+        </header>
 
-    <!-- Tabla Items -->
-    <div class="mb-8">
-        <table class="w-full">
-            <thead>
-                <tr class="border-b-2 border-gray-200">
-                    <th class="text-left py-3 text-sm font-bold text-gray-600 uppercase">Descripción</th>
-                    <th class="text-center py-3 text-sm font-bold text-gray-600 uppercase">Cant.</th>
-                    <th class="text-right py-3 text-sm font-bold text-gray-600 uppercase">Precio Unit.</th>
-                    <th class="text-right py-3 text-sm font-bold text-gray-600 uppercase">Total</th>
-                </tr>
-            </thead>
-            <tbody class="text-gray-700">
-                {% for item in recibo.detalles.all %}
-                <tr class="border-b border-gray-100">
-                    <td class="py-4">{{ item.descripcion }}</td>
-                    <td class="text-center py-4">{{ item.cantidad }}</td>
-                    <td class="text-right py-4">${{ item.precio_unitario }}</td>
-                    <td class="text-right py-4 font-medium">${{ item.subtotal }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Totales -->
-    <div class="flex justify-end border-t pt-8">
-        <div class="w-64 space-y-3">
-            <div class="flex justify-between text-xl font-bold text-gray-900">
-                <span>Total:</span>
-                <span>${{ recibo.total }}</span>
+        <!-- Información de Cliente y Empresa -->
+        <section class="info-section">
+            <div class="info-card cliente-card">
+                <div class="card-header">CLIENTE</div>
+                <div class="card-body">
+                    <p class="cliente-nombre">{{ recibo.cliente.Nombre_Apellido }}</p>
+                    <p>{{ recibo.cliente.Direccion }}</p>
+                    <p>{{ recibo.cliente.Ciudad }}</p>
+                    <p>Tel: {{ recibo.cliente.Telefono }}</p>
+                </div>
             </div>
-        </div>
-    </div>
+            <div class="info-card empresa-card">
+                <div class="card-header">compraenUSAec</div>
+                <div class="card-body empresa-datos">
+                    <p>PEDRO MONCAYO 6-34 Y OLMEDO</p>
+                    <p>Ibarra-Imbabura</p>
+                    <p>Código postal: 100150</p>
+                    <p>Teléfono: (+593) 0983050335</p>
+                    <p class="fecha-estatus">Estatus el: {{ recibo.fecha|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- Footer / Botones -->
-    <div class="mt-12 pt-8 border-t border-gray-100 flex justify-center gap-4 print:hidden">
-        <button onclick="window.print()"
-            class="bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
-            Imprimir Recibo
-        </button>
-        <a href="{% url 'recibo_view' %}"
-            class="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-            Generar Nuevo
-        </a>
+        <!-- Tabla de Productos -->
+        <section class="productos-section">
+            <table class="productos-tabla">
+                <thead>
+                    <tr>
+                        <th>TIENDA</th>
+                        <th>WR</th>
+                        <th>TRK ID</th>
+                        <th class="col-numero">ABONO</th>
+                        <th class="col-numero">PRECIO</th>
+                        <th class="col-numero">SUBTOTAL</th>
+                        <th class="col-numero">PESO/L</th>
+                        <th class="col-numero">VALOR/PESO</th>
+                        <th class="col-numero">TOTAL/PESO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in recibo.detalles.all %}
+                    <tr>
+                        <td>{{ detalle.tienda|default:"-" }}</td>
+                        <td>{{ detalle.wr|default:"-" }}</td>
+                        <td>{{ detalle.tracking_id }}</td>
+                        <td class="col-numero">{% if detalle.abono > 0 %}${{ detalle.abono|floatformat:2 }}{% else %}-{% endif %}</td>
+                        <td class="col-numero">{% if detalle.precio_producto > 0 %}${{ detalle.precio_producto|floatformat:2 }}{% else %}-{% endif %}</td>
+                        <td class="col-numero subtotal">{% if detalle.saldo_producto > 0 %}${{ detalle.saldo_producto|floatformat:2 }}{% else %}$0.00{% endif %}</td>
+                        <td class="col-numero">{{ detalle.peso_libras|floatformat:2 }}</td>
+                        <td class="col-numero">${{ detalle.precio_por_libra|floatformat:2 }}</td>
+                        <td class="col-numero total-flete">${{ detalle.total_flete|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Footer con Totales -->
+        <footer class="recibo-footer">
+            <div class="notas-section">
+                <p class="nota-entrega">Los tiempos de entrega corren desde que los productos estén en bodega de MIAMI</p>
+                <p class="fecha-emision">Fecha de emisión: {{ recibo.fecha|date:"d/m/Y" }}</p>
+                <p class="mensaje-gracias">¡Gracias por su confianza!</p>
+            </div>
+            <div class="totales-section">
+                <div class="total-row">
+                    <span class="total-label">SUBTOTAL</span>
+                    <span class="total-valor">${{ recibo.subtotal_productos|floatformat:2 }}</span>
+                </div>
+                <div class="total-row">
+                    <span class="total-label">FLETE</span>
+                    <span class="total-valor">${{ recibo.subtotal_flete|floatformat:2 }}</span>
+                </div>
+                <div class="total-row total-final">
+                    <span class="total-label">TOTAL</span>
+                    <span class="total-valor">${{ recibo.total|floatformat:2 }}</span>
+                </div>
+            </div>
+        </footer>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

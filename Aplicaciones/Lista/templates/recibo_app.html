@@ -1,241 +1,692 @@
 {% extends 'base.html' %}
-
 {% block title %}Generar Recibo - CompraEnUSAec{% endblock %}
-
 {% block content %}
-<div class="max-w-5xl mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Generar Recibo de Courier</h1>
+    <p class="text-gray-500 mt-1">
+      Agregue múltiples paquetes antes de generar el recibo final
+    </p>
+  </div>
 
-        <!-- Columna Izquierda: Datos y Controles -->
-        <div class="md:col-span-2 space-y-6">
-
-            <!-- Buscador de Cliente -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">1. Datos del Cliente</h2>
-                <div class="flex gap-2 mb-4">
-                    <input type="text" id="inputCedula" placeholder="Ingrese Cédula/Código"
-                        class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 border">
-                    <button onclick="buscarCliente()"
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                        Buscar
-                    </button>
-                </div>
-
-                <div id="clienteInfo" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-100">
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Nombre</span>
-                            <span class="font-semibold text-gray-800" id="infoNombre"></span>
-                        </div>
-                        <div>
-                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Teléfono</span>
-                            <span class="font-medium text-gray-800" id="infoTelefono"></span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="block text-gray-500 text-xs uppercase tracking-wide">Dirección</span>
-                            <span class="font-medium text-gray-800" id="infoDireccion"></span>
-                        </div>
-                    </div>
-                </div>
-                <p id="errorCliente" class="hidden text-red-500 text-sm mt-2">Cliente no encontrado.</p>
-            </div>
-
-            <!-- Agregar Items -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 opacity-50 pointer-events-none transition-opacity"
-                id="panelItems">
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">2. Agregar Productos</h2>
-                <div class="grid grid-cols-12 gap-3 mb-4">
-                    <div class="col-span-6">
-                        <input type="text" id="itemDesc" placeholder="Descripción"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border">
-                    </div>
-                    <div class="col-span-2">
-                        <input type="number" id="itemCant" placeholder="Cant." value="1" min="1"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-center">
-                    </div>
-                    <div class="col-span-3">
-                        <input type="number" id="itemPrecio" placeholder="Precio ($)" step="0.01"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-right">
-                    </div>
-                    <div class="col-span-1">
-                        <button onclick="agregarItem()"
-                            class="w-full h-full flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 4v16m8-8H4" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Columna Principal: Formulario y Tabla -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- 1. Buscador de Cliente -->
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+        <div class="flex items-center gap-2 mb-4">
+          <div
+            class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+          >
+            <span class="text-blue-600 font-bold">1</span>
+          </div>
+          <h2 class="text-lg font-semibold text-gray-800">Datos del Cliente</h2>
         </div>
 
-        <!-- Columna Derecha: Resumen del Recibo -->
-        <div class="md:col-span-1">
-            <div class="bg-white p-6 rounded-xl shadow-lg border border-gray-200 sticky top-6">
-                <h3 class="text-xl font-bold text-gray-900 mb-6 border-b pb-4">Resumen de Recibo</h3>
-
-                <div class="space-y-4 mb-6 max-h-[400px] overflow-y-auto" id="listaItems">
-                    <!-- Items se agregarán aquí -->
-                    <p class="text-gray-400 text-center py-4 italic" id="emptyState">No hay ítems agregados</p>
-                </div>
-
-                <div class="border-t pt-4 space-y-2">
-                    <div class="flex justify-between text-gray-600">
-                        <span>Subtotal</span>
-                        <span id="resumenSubtotal">$0.00</span>
-                    </div>
-                    <div class="flex justify-between text-2xl font-bold text-gray-900 pt-2">
-                        <span>Total</span>
-                        <span id="resumenTotal">$0.00</span>
-                    </div>
-                </div>
-
-                <button onclick="guardarRecibo()" id="btnGuardar"
-                    class="w-full mt-8 bg-gray-900 text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>
-                    Generar Recibo
-                </button>
-            </div>
+        <div class="flex gap-2 mb-4">
+          <input
+            type="text"
+            id="inputCedula"
+            placeholder="Ingrese Cédula/Código"
+            class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2.5 border"
+          />
+          <button
+            onclick="buscarCliente()"
+            class="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 inline mr-1"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            Buscar
+          </button>
         </div>
+
+        <div
+          id="clienteInfo"
+          class="hidden bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-200"
+        >
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span
+                class="block text-blue-600 text-xs uppercase tracking-wide font-medium"
+                >Nombre</span
+              >
+              <span class="font-semibold text-gray-800" id="infoNombre"></span>
+            </div>
+            <div>
+              <span
+                class="block text-blue-600 text-xs uppercase tracking-wide font-medium"
+                >Teléfono</span
+              >
+              <span class="font-medium text-gray-800" id="infoTelefono"></span>
+            </div>
+            <div class="col-span-2">
+              <span
+                class="block text-blue-600 text-xs uppercase tracking-wide font-medium"
+                >Dirección</span
+              >
+              <span class="font-medium text-gray-800" id="infoDireccion"></span>
+            </div>
+          </div>
+        </div>
+        <p
+          id="errorCliente"
+          class="hidden text-red-500 text-sm mt-2 flex items-center gap-1"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          Cliente no encontrado.
+        </p>
+      </div>
+
+      <!-- 2. Formulario de Datos del Paquete -->
+      <div
+        class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 opacity-50 pointer-events-none transition-all duration-300"
+        id="panelItems"
+      >
+        <div class="flex items-center gap-2 mb-4">
+          <div
+            class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+          >
+            <span class="text-green-600 font-bold">2</span>
+          </div>
+          <h2 class="text-lg font-semibold text-gray-800">Datos del Paquete</h2>
+        </div>
+
+        <!-- Fila 1: Datos principales del paquete -->
+        <div class="grid grid-cols-12 gap-3 mb-3">
+          <div class="col-span-12 md:col-span-4">
+            <label class="block text-xs font-medium text-gray-700 mb-1.5"
+              >Tracking ID *</label
+            >
+            <input
+              type="text"
+              id="itemTracking"
+              placeholder="Ej: TRK123456"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 border text-sm"
+            />
+          </div>
+          <div class="col-span-6 md:col-span-4">
+            <label class="block text-xs font-medium text-gray-700 mb-1.5"
+              >Tienda</label
+            >
+            <input
+              type="text"
+              id="itemTienda"
+              placeholder="Nombre de la tienda"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 border text-sm"
+            />
+          </div>
+          <div class="col-span-6 md:col-span-4">
+            <label class="block text-xs font-medium text-gray-700 mb-1.5"
+              >WR</label
+            >
+            <input
+              type="text"
+              id="itemWR"
+              placeholder="WR"
+              class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 px-3 py-2 border text-sm"
+            />
+          </div>
+        </div>
+
+        <!-- Fila 2: Cálculo del FLETE (LO PRINCIPAL) -->
+        <div
+          class="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-3"
+        >
+          <h3
+            class="text-sm font-bold text-yellow-800 mb-3 flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            CÁLCULO DEL FLETE (Principal)
+          </h3>
+          <div class="grid grid-cols-12 gap-3">
+            <div class="col-span-6 md:col-span-4">
+              <label class="block text-xs font-bold text-yellow-800 mb-1.5"
+                >Peso (Libras) *</label
+              >
+              <input
+                type="number"
+                id="itemPesoL"
+                placeholder="0.00"
+                step="0.01"
+                oninput="calcularFlete()"
+                class="w-full rounded-lg border-yellow-400 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 px-3 py-2 border text-sm text-right font-semibold"
+              />
+            </div>
+            <div class="col-span-6 md:col-span-4">
+              <label class="block text-xs font-bold text-yellow-800 mb-1.5"
+                >Precio por Libra *</label
+              >
+              <input
+                type="number"
+                id="itemPrecioL"
+                placeholder="0.00"
+                step="0.01"
+                oninput="calcularFlete()"
+                class="w-full rounded-lg border-yellow-400 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 px-3 py-2 border text-sm text-right font-semibold"
+              />
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label class="block text-xs font-bold text-yellow-800 mb-1.5"
+                >Total Flete</label
+              >
+              <input
+                type="text"
+                id="totalFlete"
+                readonly
+                value="$0.00"
+                class="w-full rounded-lg bg-yellow-100 border-yellow-400 px-3 py-2 border text-sm text-right font-bold text-yellow-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 3: Datos del producto (OPCIONAL) -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+          <h3 class="text-sm font-semibold text-blue-800 mb-3">
+            Compra de Producto (Opcional)
+          </h3>
+          <div class="grid grid-cols-12 gap-3">
+            <div class="col-span-6 md:col-span-4">
+              <label class="block text-xs font-medium text-blue-700 mb-1.5"
+                >Precio Producto</label
+              >
+              <input
+                type="number"
+                id="itemPrecio"
+                placeholder="0.00"
+                step="0.01"
+                oninput="calcularSaldo()"
+                class="w-full rounded-lg border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm text-right"
+              />
+            </div>
+            <div class="col-span-6 md:col-span-4">
+              <label class="block text-xs font-medium text-blue-700 mb-1.5"
+                >Abono</label
+              >
+              <input
+                type="number"
+                id="itemAbono"
+                placeholder="0.00"
+                step="0.01"
+                oninput="calcularSaldo()"
+                class="w-full rounded-lg border-blue-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-3 py-2 border text-sm text-right"
+              />
+            </div>
+            <div class="col-span-12 md:col-span-4">
+              <label class="block text-xs font-medium text-blue-700 mb-1.5"
+                >Saldo Producto</label
+              >
+              <input
+                type="text"
+                id="saldoProducto"
+                readonly
+                value="$0.00"
+                class="w-full rounded-lg bg-blue-100 border-blue-300 px-3 py-2 border text-sm text-right font-semibold text-blue-900"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Botón Agregar -->
+        <button
+          onclick="agregarItem()"
+          class="w-full h-12 flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md font-semibold text-sm"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 mr-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          Agregar Paquete
+        </button>
+      </div>
+
+      <!-- 3. Tabla de Paquetes Agregados -->
+      <div
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+        id="tablaContainer"
+        style="display: none"
+      >
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <div
+                class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center"
+              >
+                <span class="text-white font-bold">3</span>
+              </div>
+              <h2 class="text-lg font-semibold text-white">
+                Paquetes Agregados
+              </h2>
+            </div>
+            <span
+              class="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-medium"
+              id="itemCount"
+              >0 paquetes</span
+            >
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th
+                  class="px-3 py-2 text-left font-semibold text-gray-600 uppercase"
+                >
+                  Tracking
+                </th>
+                <th
+                  class="px-3 py-2 text-left font-semibold text-gray-600 uppercase"
+                >
+                  Tienda
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase"
+                >
+                  Peso (lb)
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase"
+                >
+                  $/lb
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase bg-yellow-50"
+                >
+                  Flete
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase"
+                >
+                  Precio
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase"
+                >
+                  Abono
+                </th>
+                <th
+                  class="px-3 py-2 text-right font-semibold text-gray-600 uppercase"
+                >
+                  Saldo
+                </th>
+                <th
+                  class="px-3 py-2 text-center font-semibold text-gray-600 uppercase w-16"
+                >
+                  Acción
+                </th>
+              </tr>
+            </thead>
+            <tbody id="tablaItems" class="divide-y divide-gray-200">
+              <!-- Items se agregarán aquí -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+
+    <!-- Columna Derecha: Resumen -->
+    <div class="lg:col-span-1">
+      <div
+        class="bg-white rounded-xl shadow-lg border border-gray-200 sticky top-6"
+      >
+        <div
+          class="bg-gradient-to-r from-indigo-600 to-blue-600 px-6 py-4 rounded-t-xl"
+        >
+          <h3 class="text-xl font-bold text-white">Resumen del Recibo</h3>
+        </div>
+
+        <div class="p-6 space-y-4">
+          <div
+            class="flex justify-between items-center py-2 border-b border-gray-100"
+          >
+            <span class="text-gray-600 font-medium">Paquetes:</span>
+            <span class="font-semibold text-gray-900" id="resumenItems">0</span>
+          </div>
+          <div
+            class="flex justify-between items-center py-2 border-b border-gray-100 bg-yellow-50 -mx-6 px-6"
+          >
+            <span class="text-yellow-800 font-bold">Flete Total:</span>
+            <span class="font-bold text-yellow-900 text-lg" id="resumenFlete"
+              >$0.00</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center py-2 border-b border-gray-100"
+          >
+            <span class="text-gray-600 font-medium">Productos:</span>
+            <span class="font-semibold text-gray-900" id="resumenProductos"
+              >$0.00</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center py-2 border-b border-gray-100"
+          >
+            <span class="text-gray-600 font-medium">Abonos:</span>
+            <span class="font-semibold text-green-600" id="resumenAbonos"
+              >$0.00</span
+            >
+          </div>
+          <div
+            class="flex justify-between items-center py-3 bg-gradient-to-r from-blue-50 to-indigo-50 -mx-6 px-6 rounded-lg"
+          >
+            <span class="text-lg font-bold text-gray-900">Total Final:</span>
+            <span class="text-2xl font-bold text-blue-600" id="resumenTotal"
+              >$0.00</span
+            >
+          </div>
+        </div>
+
+        <div class="px-6 pb-6">
+          <button
+            onclick="guardarRecibo()"
+            id="btnGuardar"
+            class="w-full bg-gradient-to-r from-gray-900 to-gray-800 text-white py-3.5 rounded-lg font-semibold hover:from-gray-800 hover:to-gray-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg disabled:shadow-none"
+            disabled
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 inline mr-2"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            Generar Recibo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    let clienteActual = null;
-    let items = [];
+  let clienteActual = null;
+  let items = [];
 
-    function buscarCliente() {
-        const codigo = document.getElementById('inputCedula').value;
-        if (!codigo) return;
+  function calcularFlete() {
+    const peso = parseFloat(document.getElementById("itemPesoL").value) || 0;
+    const precioLb =
+      parseFloat(document.getElementById("itemPrecioL").value) || 0;
+    const totalFlete = peso * precioLb;
+    document.getElementById("totalFlete").value = `$${totalFlete.toFixed(2)}`;
+  }
 
-        fetch(`/api/buscar-cliente/?codigo=${codigo}`)
-            .then(r => r.json())
-            .then(data => {
-                const infoDiv = document.getElementById('clienteInfo');
-                const errorP = document.getElementById('errorCliente');
-                const panelItems = document.getElementById('panelItems');
+  function calcularSaldo() {
+    const precio = parseFloat(document.getElementById("itemPrecio").value) || 0;
+    const abono = parseFloat(document.getElementById("itemAbono").value) || 0;
+    const saldo = precio - abono;
+    document.getElementById("saldoProducto").value = `$${saldo.toFixed(2)}`;
+  }
 
-                if (data.found) {
-                    clienteActual = codigo;
-                    document.getElementById('infoNombre').textContent = data.nombre;
-                    document.getElementById('infoTelefono').textContent = data.telefono;
-                    document.getElementById('infoDireccion').textContent = data.direccion;
-
-                    infoDiv.classList.remove('hidden');
-                    errorP.classList.add('hidden');
-                    panelItems.classList.remove('opacity-50', 'pointer-events-none');
-                } else {
-                    clienteActual = null;
-                    infoDiv.classList.add('hidden');
-                    errorP.classList.remove('hidden');
-                    panelItems.classList.add('opacity-50', 'pointer-events-none');
-                }
-            });
+  function buscarCliente() {
+    const codigo = document.getElementById("inputCedula").value.trim();
+    if (!codigo) {
+      alert("Por favor ingrese un código de cliente");
+      return;
     }
 
-    function agregarItem() {
-        const desc = document.getElementById('itemDesc').value;
-        const cant = parseInt(document.getElementById('itemCant').value);
-        const precio = parseFloat(document.getElementById('itemPrecio').value);
+    fetch(`/api/buscar-cliente/?codigo=${codigo}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const infoDiv = document.getElementById("clienteInfo");
+        const errorP = document.getElementById("errorCliente");
+        const panelItems = document.getElementById("panelItems");
 
-        if (!desc || !cant || isNaN(precio)) return;
+        if (data.found) {
+          clienteActual = codigo;
+          document.getElementById("infoNombre").textContent = data.nombre;
+          document.getElementById("infoTelefono").textContent = data.telefono;
+          document.getElementById("infoDireccion").textContent = data.direccion;
 
-        const subtotal = cant * precio;
-        items.push({ descripcion: desc, cantidad: cant, precio_unitario: precio, subtotal: subtotal });
-
-        actualizarVistaItems();
-        limpiarInputsItem();
-    }
-
-    function limpiarInputsItem() {
-        document.getElementById('itemDesc').value = '';
-        document.getElementById('itemCant').value = '1';
-        document.getElementById('itemPrecio').value = '';
-        document.getElementById('itemDesc').focus();
-    }
-
-    function actualizarVistaItems() {
-        const lista = document.getElementById('listaItems');
-        const empty = document.getElementById('emptyState');
-        const btn = document.getElementById('btnGuardar');
-
-        if (items.length > 0) {
-            empty.classList.add('hidden');
-            btn.disabled = false;
+          infoDiv.classList.remove("hidden");
+          errorP.classList.add("hidden");
+          panelItems.classList.remove("opacity-50", "pointer-events-none");
         } else {
-            empty.classList.remove('hidden');
-            btn.disabled = true;
+          clienteActual = null;
+          infoDiv.classList.add("hidden");
+          errorP.classList.remove("hidden");
+          panelItems.classList.add("opacity-50", "pointer-events-none");
         }
+      })
+      .catch((err) => {
+        alert("Error al buscar cliente");
+        console.error(err);
+      });
+  }
 
-        lista.innerHTML = '';
-        let total = 0;
+  function agregarItem() {
+    const tracking = document.getElementById("itemTracking").value.trim();
+    const peso = parseFloat(document.getElementById("itemPesoL").value) || 0;
+    const precioLb =
+      parseFloat(document.getElementById("itemPrecioL").value) || 0;
+    const tienda = document.getElementById("itemTienda").value.trim();
+    const wr = document.getElementById("itemWR").value.trim();
+    const precio = parseFloat(document.getElementById("itemPrecio").value) || 0;
+    const abono = parseFloat(document.getElementById("itemAbono").value) || 0;
 
-        items.forEach((item, index) => {
-            total += item.subtotal;
-            const div = document.createElement('div');
-            div.className = 'flex justify-between items-start text-sm group';
-            div.innerHTML = `
-                <div class="flex-1">
-                    <p class="font-medium text-gray-800">${item.descripcion}</p>
-                    <p class="text-gray-500 text-xs">${item.cantidad} x $${item.precio_unitario.toFixed(2)}</p>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="font-semibold text-gray-700">$${item.subtotal.toFixed(2)}</span>
-                    <button onclick="eliminarItem(${index})" class="text-red-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                        &times;
+    if (!tracking) {
+      alert("Por favor ingrese el Tracking ID");
+      document.getElementById("itemTracking").focus();
+      return;
+    }
+
+    if (peso <= 0 || precioLb <= 0) {
+      alert(
+        "Por favor ingrese el peso y precio por libra para calcular el flete"
+      );
+      return;
+    }
+
+    const item = {
+      tracking_id: tracking,
+      peso_libra: peso,
+      precio_libra: precioLb,
+      tienda: tienda,
+      wr: wr,
+      precio: precio,
+      abono: abono,
+      total_flete: peso * precioLb,
+      saldo_producto: precio - abono,
+    };
+
+    items.push(item);
+    actualizarVistaItems();
+    limpiarInputsItem();
+  }
+
+  function limpiarInputsItem() {
+    document.getElementById("itemTracking").value = "";
+    document.getElementById("itemPesoL").value = "";
+    document.getElementById("itemPrecioL").value = "";
+    document.getElementById("itemTienda").value = "";
+    document.getElementById("itemWR").value = "";
+    document.getElementById("itemPrecio").value = "";
+    document.getElementById("itemAbono").value = "";
+    document.getElementById("totalFlete").value = "$0.00";
+    document.getElementById("saldoProducto").value = "$0.00";
+    document.getElementById("itemTracking").focus();
+  }
+
+  function actualizarVistaItems() {
+    const tabla = document.getElementById("tablaItems");
+    const tablaContainer = document.getElementById("tablaContainer");
+    const btn = document.getElementById("btnGuardar");
+
+    if (items.length > 0) {
+      tablaContainer.style.display = "block";
+      btn.disabled = false;
+    } else {
+      tablaContainer.style.display = "none";
+      btn.disabled = true;
+    }
+
+    tabla.innerHTML = "";
+    let totalFlete = 0;
+    let totalProductos = 0;
+    let totalAbonos = 0;
+
+    items.forEach((item, index) => {
+      totalFlete += item.total_flete;
+      totalProductos += item.saldo_producto;
+      totalAbonos += item.abono;
+
+      const tr = document.createElement("tr");
+      tr.className = "hover:bg-gray-50 transition-colors";
+      tr.innerHTML = `
+                <td class="px-3 py-2 font-medium text-gray-900">${
+                  item.tracking_id
+                }</td>
+                <td class="px-3 py-2 text-gray-600">${item.tienda || "-"}</td>
+                <td class="px-3 py-2 text-gray-900 text-right font-semibold">${item.peso_libra.toFixed(
+                  2
+                )}</td>
+                <td class="px-3 py-2 text-gray-900 text-right">$${item.precio_libra.toFixed(
+                  2
+                )}</td>
+                <td class="px-3 py-2 text-right font-bold text-yellow-700 bg-yellow-50">$${item.total_flete.toFixed(
+                  2
+                )}</td>
+                <td class="px-3 py-2 text-gray-600 text-right">${
+                  item.precio > 0 ? "$" + item.precio.toFixed(2) : "-"
+                }</td>
+                <td class="px-3 py-2 text-green-600 text-right">${
+                  item.abono > 0 ? "$" + item.abono.toFixed(2) : "-"
+                }</td>
+                <td class="px-3 py-2 text-blue-600 font-semibold text-right">${
+                  item.saldo_producto > 0
+                    ? "$" + item.saldo_producto.toFixed(2)
+                    : "-"
+                }</td>
+                <td class="px-3 py-2 text-center">
+                    <button onclick="eliminarItem(${index})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                     </button>
-                </div>
+                </td>
             `;
-            lista.appendChild(div);
-        });
+      tabla.appendChild(tr);
+    });
 
-        document.getElementById('resumenSubtotal').textContent = `$${total.toFixed(2)}`;
-        document.getElementById('resumenTotal').textContent = `$${total.toFixed(2)}`;
+    const totalFinal = totalFlete + totalProductos;
+    document.getElementById("resumenItems").textContent = items.length;
+    document.getElementById("itemCount").textContent = `${
+      items.length
+    } paquete${items.length !== 1 ? "s" : ""}`;
+    document.getElementById(
+      "resumenFlete"
+    ).textContent = `$${totalFlete.toFixed(2)}`;
+    document.getElementById(
+      "resumenProductos"
+    ).textContent = `$${totalProductos.toFixed(2)}`;
+    document.getElementById(
+      "resumenAbonos"
+    ).textContent = `$${totalAbonos.toFixed(2)}`;
+    document.getElementById(
+      "resumenTotal"
+    ).textContent = `$${totalFinal.toFixed(2)}`;
+  }
+
+  function eliminarItem(index) {
+    if (confirm("¿Está seguro de eliminar este paquete?")) {
+      items.splice(index, 1);
+      actualizarVistaItems();
     }
+  }
 
-    function eliminarItem(index) {
-        items.splice(index, 1);
-        actualizarVistaItems();
-    }
+  function guardarRecibo() {
+    if (!clienteActual || items.length === 0) return;
 
-    function guardarRecibo() {
-        if (!clienteActual || items.length === 0) return;
+    const btn = document.getElementById("btnGuardar");
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML =
+      '<svg class="animate-spin h-5 w-5 inline mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Procesando...';
 
-        const btn = document.getElementById('btnGuardar');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Procesando...';
-
-        fetch('/api/guardar-recibo/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({
-                cliente_codigo: clienteActual,
-                items: items
-            })
-        })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    // Redirigir a la vista de impresión del recibo
-                    window.location.href = `/recibo/${data.recibo_id}/`;
-                } else {
-                    alert('Error: ' + data.error);
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }
-            })
-            .catch(err => {
-                alert('Error de conexión');
-                btn.disabled = false;
-                btn.textContent = originalText;
-            });
-    }
+    fetch("/api/guardar-recibo/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({
+        cliente_codigo: clienteActual,
+        items: items,
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success) {
+          window.open(`/recibo/${data.recibo_id}/pdf/`, "_blank");
+          // Redirect to home or recibo_view after opening PDF
+          window.location.href = "/recibo/";
+        } else {
+          alert("Error: " + data.error);
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      })
+      .catch((err) => {
+        alert("Error de conexión");
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      });
+  }
 </script>
 {% endblock %}

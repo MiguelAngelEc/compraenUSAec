@@ -9,10 +9,7 @@ import os
 DEBUG = False
 
 # Dominios permitidos
-ALLOWED_HOSTS = [
-    "recibo.compraenusaec.com",
-    "www.recibo.compraenusaec.com",
-]
+ALLOWED_HOSTS = ["*"]
 
 # Clave secreta - CAMBIAR EN PRODUCCIÓN
 SECRET_KEY = os.environ.get(

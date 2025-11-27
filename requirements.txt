@@ -38,12 +38,12 @@ whitenoise>=6.0.0
 python-dotenv>=1.0.0
 
 # ===========================================
-# BASE DE DATOS (Opcionales)
+# BASE DE DATOS
 # ===========================================
 # SQLite viene incluido en Python
-# Descomentar si usas PostgreSQL o MySQL:
-# psycopg2-binary>=2.9.0    # PostgreSQL
-# mysqlclient>=2.1.0        # MySQL
+# Para Render con PostgreSQL:
+psycopg2-binary>=2.9.0
+dj-database-url>=2.1.0
 
 # ===========================================
 # DESARROLLO (Opcional)

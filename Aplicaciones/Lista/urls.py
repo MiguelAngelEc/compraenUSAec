@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -15,6 +16,10 @@ urlpatterns = [
     # --- APIs ---
     path("api/buscar-cliente/", views.buscar_cliente_api, name="buscar_cliente_api"),
     path("api/guardar-recibo/", views.guardar_recibo_api, name="guardar_recibo_api"),
-    # --- Diagnóstico (solo para debugging) ---
-    path("api/pdf-status/", views.pdf_status, name="pdf_status"),
 ]
+
+# --- Diagnóstico (solo en modo DEBUG) ---
+if settings.DEBUG:
+    urlpatterns += [
+        path("api/pdf-status/", views.pdf_status, name="pdf_status"),
+    ]

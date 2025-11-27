@@ -21,12 +21,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "$_-01fz%$4g2+fn81z=4b1$2y(0lhj4-g&p^tjt%m8^xn!jq09"
+# En producción, usar variable de entorno DJANGO_SECRET_KEY
+SECRET_KEY = os.environ.get(
+    "DJANGO_SECRET_KEY",
+    "$_-01fz%$4g2+fn81z=4b1$2y(0lhj4-g&p^tjt%m8^xn!jq09",  # Solo para desarrollo local
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
 
 # Application definition
@@ -79,7 +83,7 @@ WSGI_APPLICATION = "compraenUSAec_Recibo.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "Aplicaciones.db",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -122,3 +126,10 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# Media files
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

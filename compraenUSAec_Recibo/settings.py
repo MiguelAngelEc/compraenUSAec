@@ -281,7 +281,7 @@ if IS_PRODUCTION:
 
     # Protección adicional de cookies
     SESSION_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False
 
     # Protección contra XSS y clickjacking
     SECURE_BROWSER_XSS_FILTER = True

@@ -48,12 +48,12 @@
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for c in listado %}
                     <tr class="hover:bg-gray-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{c.codigo}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{c.Nombre_Apellido}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{c.Direccion}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{c.Ciudad}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{c.Telefono}}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{c.email}}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ c.codigo }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ c.nombre_apellido }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ c.direccion }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ c.ciudad }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ c.telefono }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ c.email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <a href="{% url 'edicionCliente' c.codigo %}"
                                 class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</a>

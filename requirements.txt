@@ -34,20 +34,18 @@ whitenoise>=6.0.0
 # ===========================================
 # SEGURIDAD Y UTILIDADES
 # ===========================================
-# Variables de entorno (recomendado para producción)
+# Variables de entorno
 python-dotenv>=1.0.0
 
 # ===========================================
-# BASE DE DATOS
+# SUPABASE (Backend de datos)
 # ===========================================
-# SQLite viene incluido en Python
-# Para Render con PostgreSQL:
-psycopg2-binary>=2.9.0
-dj-database-url>=2.1.0
+# Cliente oficial de Supabase para Python
+supabase>=2.0.0
 
 # ===========================================
-# DESARROLLO (Opcional)
+# NOTAS
 # ===========================================
-# Descomentar para desarrollo local:
-# django-debug-toolbar>=4.0.0
-# django-extensions>=3.2.0
+# Este proyecto usa Supabase como backend de datos.
+# NO se usa Django ORM para datos de negocio.
+# SQLite solo se usa para sesiones de Django.

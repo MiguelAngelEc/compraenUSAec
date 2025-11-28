@@ -26,10 +26,10 @@
             <div class="info-card cliente-card">
                 <div class="card-header">CLIENTE</div>
                 <div class="card-body">
-                    <p class="cliente-nombre">{{ recibo.cliente.Nombre_Apellido }}</p>
-                    <p>{{ recibo.cliente.Direccion }}</p>
-                    <p>{{ recibo.cliente.Ciudad }}</p>
-                    <p>Tel: {{ recibo.cliente.Telefono }}</p>
+                    <p class="cliente-nombre">{{ recibo.clientes.nombre_apellido }}</p>
+                    <p>{{ recibo.clientes.direccion }}</p>
+                    <p>{{ recibo.clientes.ciudad }}</p>
+                    <p>Tel: {{ recibo.clientes.telefono }}</p>
                 </div>
             </div>
             <div class="info-card empresa-card">
@@ -39,7 +39,7 @@
                     <p>Ibarra-Imbabura</p>
                     <p>Código postal: 100150</p>
                     <p>Teléfono: (+593) 0983050335</p>
-                    <p class="fecha-estatus">Estatus el: {{ recibo.fecha|date:"d/m/Y" }}</p>
+                    <p class="fecha-estatus">Estatus el: {{ recibo.fecha }}</p>
                 </div>
             </div>
         </section>
@@ -61,7 +61,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for detalle in recibo.detalles.all %}
+                    {% for detalle in recibo.detalles %}
                     <tr>
                         <td>{{ detalle.tienda|default:"-" }}</td>
                         <td>{{ detalle.wr|default:"-" }}</td>
@@ -73,6 +73,10 @@
                         <td class="col-numero">${{ detalle.precio_por_libra|floatformat:2 }}</td>
                         <td class="col-numero total-flete">${{ detalle.total_flete|floatformat:2 }}</td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No hay detalles en este recibo</td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -82,7 +86,7 @@
         <footer class="recibo-footer">
             <div class="notas-section">
                 <p class="nota-entrega">Los tiempos de entrega corren desde que los productos estén en bodega de MIAMI</p>
-                <p class="fecha-emision">Fecha de emisión: {{ recibo.fecha|date:"d/m/Y" }}</p>
+                <p class="fecha-emision">Fecha de emisión: {{ recibo.fecha }}</p>
                 <p class="mensaje-gracias">¡Gracias por su confianza!</p>
             </div>
             <div class="totales-section">

@@ -1,24 +1,32 @@
 """
 Django settings for compraenUSAec_Recibo project.
 
-Este archivo está configurado para funcionar tanto en desarrollo local
-como en producción (Render, Hostinger, etc.) usando variables de entorno.
+Este proyecto usa Supabase como backend de datos a través de su API REST.
+NO usa Django ORM para datos de negocio - solo para sesiones y admin.
 
-VARIABLES DE ENTORNO REQUERIDAS EN PRODUCCIÓN:
-- DJANGO_SECRET_KEY: Clave secreta única y segura
-- DATABASE_URL: URL de conexión a PostgreSQL (opcional, usa SQLite si no está)
-- ALLOWED_HOSTS: Hosts permitidos separados por coma
-- RENDER_EXTERNAL_HOSTNAME: Hostname automático de Render (opcional)
+VARIABLES DE ENTORNO REQUERIDAS:
+- DJANGO_SECRET_KEY: Clave secreta única y segura (OBLIGATORIA en producción)
+- SUPABASE_URL: URL del proyecto Supabase
+- SUPABASE_ANON_KEY: Clave anónima de Supabase
+- SUPABASE_SERVICE_ROLE_KEY: Clave de servicio (para operaciones admin)
 
 VARIABLES OPCIONALES:
-- DEBUG: "True" o "False" (default: "True" en desarrollo)
-- CSRF_TRUSTED_ORIGINS: Orígenes CSRF adicionales separados por coma
-- DJANGO_LOG_LEVEL: Nivel de logging (default: "INFO")
+- DEBUG: "True" o "False" (default: "False" en producción)
+- ALLOWED_HOSTS: Hosts permitidos separados por coma
+- RENDER_EXTERNAL_HOSTNAME: Hostname automático de Render
+- CSRF_TRUSTED_ORIGINS: Orígenes CSRF adicionales
 """
 
 from pathlib import Path
 import os
-import sys
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except ImportError:
+    pass
 
 # =============================================================================
 # CONFIGURACIÓN BASE
@@ -32,14 +40,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # =============================================================================
 
 # Detectar si estamos en producción basado en variables de entorno
-# Se considera producción si:
-# 1. DEBUG está explícitamente en "False"
-# 2. Existe RENDER_EXTERNAL_HOSTNAME (Render)
-# 3. Existe DATABASE_URL (típico de PaaS)
 IS_PRODUCTION = (
     os.environ.get("DEBUG", "True").lower() == "false"
     or os.environ.get("RENDER_EXTERNAL_HOSTNAME") is not None
-    or os.environ.get("DATABASE_URL") is not None
 )
 
 # =============================================================================
@@ -169,43 +172,32 @@ TEMPLATES = [
 ]
 
 # =============================================================================
-# BASE DE DATOS
+# BASE DE DATOS (Solo para Django Admin y Sesiones)
 # =============================================================================
 
-# Intentar usar PostgreSQL si DATABASE_URL está configurada
-DATABASE_URL = os.environ.get("DATABASE_URL")
-
-if DATABASE_URL:
-    # Producción: Usar PostgreSQL con dj-database-url
-    try:
-        import dj_database_url
-
-        DATABASES = {
-            "default": dj_database_url.config(
-                default=DATABASE_URL,
-                conn_max_age=600,  # Conexiones persistentes
-                conn_health_checks=True,  # Verificar salud de conexiones
-                ssl_require=not DEBUG,  # SSL en producción
-            )
-        }
-        print(f"✓ Base de datos: PostgreSQL configurada")
-    except ImportError:
-        raise ImportError(
-            "DATABASE_URL está configurada pero 'dj-database-url' no está instalado.\n"
-            "Instálelo con: pip install dj-database-url"
-        )
-else:
-    # Desarrollo: Usar SQLite
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
+# NOTA: Los datos de negocio (clientes, recibos) se manejan con Supabase API
+# Django solo usa SQLite para sesiones y el admin panel
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-    if IS_PRODUCTION:
+}
+
+# =============================================================================
+# CONFIGURACIÓN DE SUPABASE
+# =============================================================================
+
+# Validar que las variables de Supabase estén configuradas
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+SUPABASE_SERVICE_ROLE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+
+if IS_PRODUCTION:
+    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
         print(
-            "⚠️ ADVERTENCIA: Usando SQLite en producción. "
-            "Configure DATABASE_URL para usar PostgreSQL."
+            "⚠️ ADVERTENCIA: SUPABASE_URL o SUPABASE_ANON_KEY no están configuradas. "
+            "La aplicación no podrá conectarse a Supabase."
         )
 
 # =============================================================================
@@ -399,7 +391,7 @@ if IS_PRODUCTION:
     print(f"   DEBUG: {DEBUG}")
     print(f"   ALLOWED_HOSTS: {ALLOWED_HOSTS}")
     print(f"   CSRF_TRUSTED_ORIGINS: {CSRF_TRUSTED_ORIGINS}")
-    print(f"   DATABASE: {'PostgreSQL' if DATABASE_URL else 'SQLite (⚠️)'}")
+    print(f"   SUPABASE: {'✓ Configurado' if SUPABASE_URL else '✗ No configurado'}")
     print(f"   STATIC_STORAGE: {STATICFILES_STORAGE}")
     print("=" * 60)
 
@@ -407,27 +399,23 @@ if IS_PRODUCTION:
 # NOTAS DE DESPLIEGUE
 # =============================================================================
 """
-PARA RENDER:
-1. Configurar variables de entorno en el dashboard:
-   - SECRET_KEY o DJANGO_SECRET_KEY: (generar una clave segura)
-   - DATABASE_URL: (se configura automáticamente con PostgreSQL)
-   - DJANGO_SETTINGS_MODULE: compraenUSAec_Recibo.settings
-   - DEBUG: False
-   - ALLOWED_HOSTS: tu-app.onrender.com,tudominio.com
+CONFIGURACIÓN REQUERIDA:
 
-2. El RENDER_EXTERNAL_HOSTNAME se configura automáticamente
+1. Variables de entorno para Supabase (OBLIGATORIAS):
+   - SUPABASE_URL: URL de tu proyecto Supabase
+   - SUPABASE_ANON_KEY: Clave anónima (para operaciones públicas)
+   - SUPABASE_SERVICE_ROLE_KEY: Clave de servicio (para operaciones admin)
 
-PARA HOSTINGER:
-1. Configurar variables de entorno en el panel:
-   - DJANGO_SECRET_KEY: (generar una clave segura)
-   - DATABASE_URL: postgres://usuario:password@host:5432/database
-   - DEBUG: False
-   - ALLOWED_HOSTS: tudominio.com,www.tudominio.com
-   - CSRF_TRUSTED_ORIGINS: https://tudominio.com,https://www.tudominio.com
+2. Variables de entorno para Django:
+   - DJANGO_SECRET_KEY: Clave secreta única (OBLIGATORIA en producción)
+   - DEBUG: False (en producción)
+   - ALLOWED_HOSTS: dominios permitidos separados por coma
 
-PARA DESARROLLO LOCAL:
-1. No se requieren variables de entorno
-2. DEBUG=True por defecto
-3. Usa SQLite automáticamente
-4. ALLOWED_HOSTS incluye localhost por defecto
+3. Para Render:
+   - RENDER_EXTERNAL_HOSTNAME se configura automáticamente
+
+4. Para desarrollo local:
+   - Crear archivo .env con las variables de Supabase
+   - DEBUG=True por defecto
+   - ALLOWED_HOSTS incluye localhost automáticamente
 """

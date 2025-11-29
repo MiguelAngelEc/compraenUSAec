@@ -14,6 +14,7 @@ import os
 from functools import lru_cache
 from typing import Optional, List, Dict, Any
 from decimal import Decimal
+from datetime import datetime
 
 # Cargar variables de entorno
 try:
@@ -205,9 +206,8 @@ def create_recibo(cliente_codigo: str, totales: Dict[str, Any]) -> Dict[str, Any
     Args:
         cliente_codigo: Código del cliente
         totales: Diccionario con totales:
-            - subtotal_productos
-            - total_abonos
             - subtotal_flete
+            - subtotal_envios
             - total
 
     Returns:
@@ -216,9 +216,8 @@ def create_recibo(cliente_codigo: str, totales: Dict[str, Any]) -> Dict[str, Any
     client = get_supabase_client()
     recibo_data = {
         "cliente_codigo": cliente_codigo,
-        "subtotal_productos": float(totales.get("subtotal_productos", 0)),
-        "total_abonos": float(totales.get("total_abonos", 0)),
         "subtotal_flete": float(totales.get("subtotal_flete", 0)),
+        "subtotal_envios": float(totales.get("subtotal_envios", 0)),
         "total": float(totales.get("total", 0)),
     }
     response = client.table("recibos").insert(recibo_data).execute()
@@ -238,9 +237,9 @@ def create_detalle_recibo(recibo_id: int, detalle: Dict[str, Any]) -> Dict[str, 
             - peso_libras
             - precio_por_libra
             - total_flete
-            - precio_producto
-            - abono
-            - saldo_producto
+            - empresa_envio
+            - num_paquetes
+            - costo_envio
 
     Returns:
         Diccionario con el detalle creado
@@ -254,9 +253,9 @@ def create_detalle_recibo(recibo_id: int, detalle: Dict[str, Any]) -> Dict[str, 
         "peso_libras": float(detalle.get("peso_libras", 0)),
         "precio_por_libra": float(detalle.get("precio_por_libra", 0)),
         "total_flete": float(detalle.get("total_flete", 0)),
-        "precio_producto": float(detalle.get("precio_producto", 0)),
-        "abono": float(detalle.get("abono", 0)),
-        "saldo_producto": float(detalle.get("saldo_producto", 0)),
+        "empresa_envio": detalle.get("empresa_envio", ""),
+        "num_paquetes": int(detalle.get("num_paquetes", 0)),
+        "costo_envio": float(detalle.get("costo_envio", 0)),
     }
     response = client.table("detalle_recibo").insert(detalle_data).execute()
     return response.data[0] if response.data else None
@@ -287,6 +286,9 @@ def get_recibo_by_id(recibo_id: int) -> Optional[Dict[str, Any]]:
         return None
 
     recibo = response.data[0]
+
+    if isinstance(recibo.get("fecha"), str):
+        recibo["fecha"] = datetime.fromisoformat(recibo["fecha"])
 
     # Obtener detalles del recibo
     detalles_response = (
@@ -320,4 +322,12 @@ def get_recibos_by_cliente(cliente_codigo: str) -> List[Dict[str, Any]]:
         .order("fecha", desc=True)
         .execute()
     )
-    return response.data or []
+
+    data = response.data or []
+
+    for r in data:
+        if isinstance(r["fecha"], str):
+            # Convierte ISO 8601 a datetime
+            r["fecha"] = datetime.fromisoformat(r["fecha"])
+
+    return data

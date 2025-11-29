@@ -41,19 +41,18 @@ class ReciboService:
         """
         Crea un recibo completo con sus detalles en Supabase.
 
-        LÓGICA PRINCIPAL: El costo es por libras (peso × precio_por_libra)
-        SECUNDARIO: Si hay productos comprados, calcular saldo (precio - abono)
+        LÓGICA: Calcula el costo total por item = (peso × precio_por_libra) + costo_envio
+        TOTAL = Suma de todos los costos de items
 
         Args:
             cliente_codigo: Código del cliente
             items_data: Lista de items, cada uno con:
                 - tracking_id (requerido)
-                - tienda (opcional)
-                - wr (opcional)
-                - peso_libra (requerido para calcular flete)
-                - precio_libra (requerido para calcular flete)
-                - precio (opcional, si se compró producto)
-                - abono (opcional, si hubo adelanto)
+                - peso_libra (requerido)
+                - precio_libra (requerido)
+                - empresa_envio (opcional)
+                - num_paquetes (opcional)
+                - costo_envio (opcional, costo adicional de envío)
 
         Returns:
             Diccionario con el recibo creado (incluye id)
@@ -64,9 +63,9 @@ class ReciboService:
             raise ValueError(f"Cliente con código {cliente_codigo} no encontrado")
 
         # Inicializar totales
-        subtotal_productos = Decimal("0.00")
-        total_abonos = Decimal("0.00")
         subtotal_flete = Decimal("0.00")
+        subtotal_envios = Decimal("0.00")
+        total_final = Decimal("0.00")
 
         # Preparar detalles y calcular totales
         detalles_preparados = []
@@ -74,12 +73,13 @@ class ReciboService:
         for item in items_data:
             peso = Decimal(str(item.get("peso_libra", 0)))
             precio_lb = Decimal(str(item.get("precio_libra", 0)))
-            precio_prod = Decimal(str(item.get("precio", 0)))
-            abono = Decimal(str(item.get("abono", 0)))
+            costo_envio = Decimal(str(item.get("costo_envio", 0)))
 
-            # Calcular valores
-            total_flete_item = peso * precio_lb
-            saldo_producto = precio_prod - abono
+            # Calcular costo base del flete
+            costo_flete = peso * precio_lb
+
+            # Costo total del item = flete + costo_envio
+            costo_total_item = costo_flete + costo_envio
 
             detalle = {
                 "tracking_id": item.get("tracking_id", ""),
@@ -87,28 +87,23 @@ class ReciboService:
                 "wr": item.get("wr", ""),
                 "peso_libras": float(peso),
                 "precio_por_libra": float(precio_lb),
-                "total_flete": float(total_flete_item),
-                "precio_producto": float(precio_prod),
-                "abono": float(abono),
-                "saldo_producto": float(saldo_producto),
+                "total_flete": float(costo_flete),
+                "empresa_envio": item.get("empresa_envio", ""),
+                "num_paquetes": int(item.get("num_paquetes", 0)),
+                "costo_envio": float(costo_envio),
             }
 
             detalles_preparados.append(detalle)
 
             # Acumular totales
-            subtotal_flete += total_flete_item
-            subtotal_productos += saldo_producto
-            total_abonos += abono
-
-        # Calcular total final
-        # TOTAL = Flete + Saldo de productos pendientes
-        total_final = subtotal_flete + subtotal_productos
+            subtotal_flete += costo_flete
+            subtotal_envios += costo_envio
+            total_final += costo_total_item
 
         # Crear recibo en Supabase
         totales = {
-            "subtotal_productos": float(subtotal_productos),
-            "total_abonos": float(total_abonos),
             "subtotal_flete": float(subtotal_flete),
+            "subtotal_envios": float(subtotal_envios),
             "total": float(total_final),
         }
 

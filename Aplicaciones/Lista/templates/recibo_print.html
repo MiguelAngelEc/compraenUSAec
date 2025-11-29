@@ -39,7 +39,7 @@
                     <p>Ibarra-Imbabura</p>
                     <p>Código postal: 100150</p>
                     <p>Teléfono: (+593) 0983050335</p>
-                    <p class="fecha-estatus">Estatus el: {{ recibo.fecha }}</p>
+                    <p class="fecha-estatus">Estatus el: {{ recibo.fecha}}</p>
                 </div>
             </div>
         </section>
@@ -49,12 +49,11 @@
             <table class="productos-tabla">
                 <thead>
                     <tr>
+                        <th>EMPRESA ENVÍO</th>
+                        <th>N° PAQ</th>
                         <th>TIENDA</th>
-                        <th>WR</th>
                         <th>TRK ID</th>
-                        <th class="col-numero">ABONO</th>
-                        <th class="col-numero">PRECIO</th>
-                        <th class="col-numero">SUBTOTAL</th>
+                        <th class="col-numero">COSTO ENVÍO</th>
                         <th class="col-numero">PESO/L</th>
                         <th class="col-numero">VALOR/PESO</th>
                         <th class="col-numero">TOTAL/PESO</th>
@@ -63,19 +62,18 @@
                 <tbody>
                     {% for detalle in recibo.detalles %}
                     <tr>
+                        <td>{{ detalle.empresa_envio|default:"-" }}</td>
+                        <td>{{ detalle.num_paquetes|default:"-" }}</td>
                         <td>{{ detalle.tienda|default:"-" }}</td>
-                        <td>{{ detalle.wr|default:"-" }}</td>
                         <td>{{ detalle.tracking_id }}</td>
-                        <td class="col-numero">{% if detalle.abono > 0 %}${{ detalle.abono|floatformat:2 }}{% else %}-{% endif %}</td>
-                        <td class="col-numero">{% if detalle.precio_producto > 0 %}${{ detalle.precio_producto|floatformat:2 }}{% else %}-{% endif %}</td>
-                        <td class="col-numero subtotal">{% if detalle.saldo_producto > 0 %}${{ detalle.saldo_producto|floatformat:2 }}{% else %}$0.00{% endif %}</td>
+                        <td class="col-numero">{% if detalle.costo_envio > 0 %}${{ detalle.costo_envio|floatformat:2 }}{% else %}$0.00{% endif %}</td>
                         <td class="col-numero">{{ detalle.peso_libras|floatformat:2 }}</td>
                         <td class="col-numero">${{ detalle.precio_por_libra|floatformat:2 }}</td>
-                        <td class="col-numero total-flete">${{ detalle.total_flete|floatformat:2 }}</td>
+                        <td class="col-numero">${{ detalle.total_flete|floatformat:2 }}</td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="text-center">No hay detalles en este recibo</td>
+                        <td colspan="8" class="text-center">No hay detalles en este recibo</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -86,20 +84,20 @@
         <footer class="recibo-footer">
             <div class="notas-section">
                 <p class="nota-entrega">Los tiempos de entrega corren desde que los productos estén en bodega de MIAMI</p>
-                <p class="fecha-emision">Fecha de emisión: {{ recibo.fecha }}</p>
+                <p class="fecha-emision">Fecha de emisión: {{ recibo.fecha}}</p>
                 <p class="mensaje-gracias">¡Gracias por su confianza!</p>
             </div>
             <div class="totales-section">
                 <div class="total-row">
-                    <span class="total-label">SUBTOTAL</span>
-                    <span class="total-valor">${{ recibo.subtotal_productos|floatformat:2 }}</span>
-                </div>
-                <div class="total-row">
-                    <span class="total-label">FLETE</span>
+                    <span class="total-label">FLETE TOTAL</span>
                     <span class="total-valor">${{ recibo.subtotal_flete|floatformat:2 }}</span>
                 </div>
+                <div class="total-row">
+                    <span class="total-label">ENVÍO TOTAL</span>
+                    <span class="total-valor">${{ recibo.subtotal_envios|floatformat:2 }}</span>
+                </div>
                 <div class="total-row total-final">
-                    <span class="total-label">TOTAL</span>
+                    <span class="total-label">TOTAL FINAL</span>
                     <span class="total-valor">${{ recibo.total|floatformat:2 }}</span>
                 </div>
             </div>
